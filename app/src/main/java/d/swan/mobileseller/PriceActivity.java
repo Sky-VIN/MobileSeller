@@ -10,34 +10,40 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-public class PriceActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class PriceActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
 
     String[] names = {"One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
             "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty"};
-    int amount = 0;
+
     PointAdapter adapter;
-/*
-    int hatch, article, amount;
-    float priceUnit, priceTotal;
-*/
+    TextView tvSummary;
 
     ArrayList<Point> price = new ArrayList<>();
 
     ListView priceList;
 
+    Button btnCreateList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_price);
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        tvSummary = (TextView) findViewById(R.id.tvSummary);
+        btnCreateList = (Button) findViewById(R.id.btnCreatePrice);
+        btnCreateList.setOnClickListener(this);
 
         priceList = (ListView) findViewById(R.id.priceList);
         priceList.setOnItemClickListener(this);
@@ -45,7 +51,7 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
 
         for (int i = 0; i<names.length; i++) {
             price.add(new Point(names[i],
-                    new Random().nextInt(), new Random().nextInt(), new Random().nextFloat(), new Random().nextFloat(), 0));
+                    new Random().nextInt(1000), new Random().nextInt(1000), new Rounding().round_up(new Random().nextFloat() * 1000), 0, 0));
         }
 
         adapter = new PointAdapter(this, price);
@@ -72,8 +78,11 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        if (TextUtils.isDigitsOnly(editText.getText().toString()))
+                        if (TextUtils.isDigitsOnly(editText.getText().toString()) || editText.getText().toString().equals("")) {
                             adapter.getPoint(position).amount = Integer.valueOf(editText.getText().toString());
+                            adapter.getPoint(position).priceTotal = new Rounding().round_up(Integer.valueOf(editText.getText().toString()) * adapter.getPoint(position).priceUnit);
+                            tvSummary.setText(String.valueOf(adapter.getSummary()) + " грн");
+                        }
                         else
                             Toast.makeText(getApplicationContext(), "Error input!", Toast.LENGTH_SHORT).show();
                     }
@@ -89,5 +98,15 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
     @Override
     public void onBackPressed() {
         // Nothing
+    }
+
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+        if (id == R.id.btnCreatePrice) {
+            Intent intent = new Intent(this, ChoicenPriceActivity.class);
+            intent.putParcelableArrayListExtra("Price", adapter.getSelectedPoints());
+            startActivity(intent);
+        }
     }
 }

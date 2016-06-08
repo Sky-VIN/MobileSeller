@@ -15,8 +15,8 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Create"
-            android:id="@+id/btnCreatePrice" />
+            android:text="Save"
+            android:id="@+id/btnSavePrice" />
 
         <TextView
             android:layout_width="match_parent"
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="0.0 грн"
-            android:id="@+id/tvSummary"
+            android:id="@+id/tvSelectedSummary"
             android:textColor="@android:color/primary_text_light" />
 
     </LinearLayout>
@@ -45,7 +45,7 @@
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/priceList"
+        android:id="@+id/selectedPriceList"
         android:layout_gravity="center_horizontal"
         android:layout_weight="1" />
 
@@ -63,19 +63,19 @@
         <Button
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:id="@+id/btnSearchCancel"
+            android:id="@+id/btnSelectedSearchCancel"
             android:background="@android:drawable/btn_dialog" />
 
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/etSearch"
+            android:id="@+id/etSelectedSearch"
             android:layout_weight="1" />
 
         <Button
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:id="@+id/btnSearch"
+            android:id="@+id/btnSelectedSearch"
             android:background="@android:drawable/ic_menu_search" />
     </LinearLayout>
 

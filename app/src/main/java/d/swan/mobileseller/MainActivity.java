@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity
     String[] addr = {"Addr1", "Addr2", "Addr3", "Addr4", "Addr5"};
     
     Spinner spinnerOrgName, spinnerAddrName;
-    Button btnCreate;
+    Button btnNewPrice;
 
 
     @Override
@@ -53,8 +53,8 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        btnCreate = (Button) findViewById(R.id.btnCreate);
-        btnCreate.setOnClickListener(new View.OnClickListener() {
+        btnNewPrice = (Button) findViewById(R.id.btnNewPrice);
+        btnNewPrice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), PriceActivity.class));

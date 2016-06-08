@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 /**
@@ -50,14 +51,35 @@ public class PointAdapter extends BaseAdapter {
 
         Point point = getPoint(position);
         ((TextView) view.findViewById(R.id.tvName)).setText(point.name);
-        ((TextView) view.findViewById(R.id.tvAmount)).setText(String.valueOf(point.amount));
+        ((TextView) view.findViewById(R.id.tvAmount)).setText(String.valueOf(point.amount) + " шт");
 
         ((TextView) view.findViewById(R.id.tvHatch)).setText(String.valueOf(point.hatch));
         ((TextView) view.findViewById(R.id.tvArticle)).setText(String.valueOf(point.article));
-        ((TextView) view.findViewById(R.id.tvPriceUnit)).setText(String.valueOf(point.priceUnit));
-        ((TextView) view.findViewById(R.id.tvPriceTotal)).setText(String.valueOf(point.priceTotal));
+        ((TextView) view.findViewById(R.id.tvPriceUnit)).setText(String.valueOf(point.priceUnit) + " грн/ед");
+        ((TextView) view.findViewById(R.id.tvPriceTotal)).setText(String.valueOf(point.priceTotal + " грн"));
 
         view.setTag(position);
         return view;
     }
+
+    public float getSummary() {
+        float result = 0;
+        for (int i=0; i < points.size(); i++) {
+            if(points.get(i).amount > 0)
+                result += points.get(i).priceUnit * points.get(i).amount;
+        }
+        return new Rounding().round_up(result);
+    }
+
+    public ArrayList<Point> getSelectedPoints() {
+        ArrayList<Point> result = new ArrayList<>();
+
+        for (int i = 0; i < points.size(); i++) {
+            if (points.get(i).amount > 0)
+                result.add(points.get(i));
+        }
+        return result;
+    }
+
+
 }
