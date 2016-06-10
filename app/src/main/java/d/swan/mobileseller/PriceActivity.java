@@ -60,8 +60,24 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home)
-            finish();
+        if (item.getItemId() == android.R.id.home) {
+            new AlertDialog.Builder(this)
+                    .setIcon(R.mipmap.ic_launcher)
+                    .setTitle(R.string.app_name)
+                    .setMessage("Если Вы вернетесь назад, то потеряете данные.\n\nПродолжить?")
+                    .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int i) {
+                            dialog.cancel();
+                        }
+                    })
+                    .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            finish();
+                        }
+                    }).show();
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -78,16 +94,26 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        if (TextUtils.isDigitsOnly(editText.getText().toString()) || editText.getText().toString().equals("")) {
+                        if (TextUtils.isDigitsOnly(editText.getText().toString()) && !editText.getText().toString().equals("")) {
                             adapter.getPoint(position).amount = Integer.valueOf(editText.getText().toString());
                             adapter.getPoint(position).priceTotal = new Rounding().round_up(Integer.valueOf(editText.getText().toString()) * adapter.getPoint(position).priceUnit);
                             tvSummary.setText(String.valueOf(adapter.getSummary()) + " грн");
+                            adapter.notifyDataSetChanged();
                         }
                         else
                             Toast.makeText(getApplicationContext(), "Error input!", Toast.LENGTH_SHORT).show();
                     }
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                .setNeutralButton("Удалить", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        adapter.getPoint(position).amount = 0;
+                        adapter.getPoint(position).priceTotal = 0;
+                        tvSummary.setText(String.valueOf(adapter.getSummary()) + " грн");
+                        adapter.notifyDataSetChanged();
+                    }
+                })
+                .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
@@ -104,9 +130,13 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
     public void onClick(View view) {
         int id = view.getId();
         if (id == R.id.btnCreatePrice) {
-            Intent intent = new Intent(this, ChoicenPriceActivity.class);
-            intent.putParcelableArrayListExtra("Price", adapter.getSelectedPoints());
-            startActivity(intent);
+            if (adapter.getSummary() == 0)
+                Toast.makeText(this, "Список пуст!", Toast.LENGTH_SHORT).show();
+            else {
+                Intent intent = new Intent(this, SelectedPriceActivity.class);
+                intent.putParcelableArrayListExtra("Price", adapter.getSelectedPoints());
+                startActivity(intent);
+            }
         }
     }
 }

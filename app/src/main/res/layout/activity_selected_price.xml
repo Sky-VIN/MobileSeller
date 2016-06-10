@@ -55,6 +55,7 @@
         android:layout_height="1dp">
     </View>
 
+<!--
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -78,5 +79,6 @@
             android:id="@+id/btnSelectedSearch"
             android:background="@android:drawable/ic_menu_search" />
     </LinearLayout>
+-->
 
 </LinearLayout>

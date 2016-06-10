@@ -16,7 +16,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Create"
-            android:id="@+id/btnCreatePrice" />
+            android:id="@+id/btnCreatePrice"
+            android:background="@android:drawable/btn_default" />
 
         <TextView
             android:layout_width="match_parent"
@@ -36,25 +37,17 @@
 
     </LinearLayout>
 
-    <View
-        android:layout_width="wrap_content"
-        android:background="@drawable/devider"
-        android:layout_height="1dp">
-    </View>
-
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/priceList"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:background="@android:drawable/edit_text"
+        android:divider="@drawable/devider"
+        android:dividerHeight="1dip" />
 
-    <View
-        android:layout_width="wrap_content"
-        android:background="@drawable/devider"
-        android:layout_height="1dp">
-    </View>
-
+<!--
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -78,5 +71,6 @@
             android:id="@+id/btnSearch"
             android:background="@android:drawable/ic_menu_search" />
     </LinearLayout>
+-->
 
 </LinearLayout>
