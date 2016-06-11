@@ -20,6 +20,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, AdapterView.OnItemSelectedListener, View.OnClickListener {
@@ -94,7 +95,8 @@ public class MainActivity extends AppCompatActivity
 
     private void refreshAddrSpinner() {
         addr.clear();
-        addr.addAll(dbh.getAllValues("Address", spinnerOrgName.getSelectedItemPosition() + 1));
+        if (spinnerOrgName.getSelectedItemPosition() > -1)
+            addr.addAll(dbh.getAllValues("Address", dbh.getLinkedIdByName("Organization", spinnerOrgName.getItemAtPosition(spinnerOrgName.getSelectedItemPosition()).toString())));
 
         addrAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, addr);
         addrAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -165,6 +167,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View view) {
         int id = view.getId();
+
         if (id == R.id.btnNewPrice) {
             if (spinnerOrgName.getSelectedItemPosition() == -1 || spinnerAddrName.getSelectedItemPosition() == -1)
                 Toast.makeText(this, "Не выбран один из пунктов!", Toast.LENGTH_SHORT).show();
@@ -184,7 +187,7 @@ public class MainActivity extends AppCompatActivity
                         public void onClick(DialogInterface dialog, int i) {
                             if (!eText.getText().toString().equals("")) {
                                 if (!dbh.identityVerification("Organization", eText.getText().toString())) {
-                                    dbh.addField("Organization", eText.getText().toString());
+                                    dbh.addField("Organization", eText.getText().toString(), dbh.findFreeLinedId());
                                     refreshOrgSpinner();
                                     refreshAddrSpinner();
                                     if (spinnerOrgName.getCount() > 0)
@@ -217,8 +220,8 @@ public class MainActivity extends AppCompatActivity
                             public void onClick(DialogInterface dialog, int i) {
                                 if (!eText.getText().toString().equals("")) {
                                     if (!dbh.identityVerification("Address", eText.getText().toString())) {
-                                        dbh.addField("Address", eText.getText().toString(), spinnerOrgName.getSelectedItemPosition() + 1);
-
+                                        int linked_id = dbh.getLinkedIdByName("Organization", spinnerOrgName.getItemAtPosition(spinnerOrgName.getSelectedItemPosition()).toString());
+                                        dbh.addField("Address", eText.getText().toString(), linked_id);
                                         refreshAddrSpinner();
                                         if (spinnerAddrName.getCount() > 0)
                                             spinnerAddrName.setSelection(spinnerAddrName.getCount() - 1);
@@ -247,13 +250,14 @@ public class MainActivity extends AppCompatActivity
                         .setPositiveButton("Да", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
-                                dbh.deleteField("Organization", spinnerOrgName.getSelectedItemPosition() + 1);
-                                dbh.deleteField("Address", spinnerOrgName.getSelectedItemPosition() + 1);
-
+                                int spinnerPosition = spinnerOrgName.getSelectedItemPosition();
+                                int linked_id = dbh.getLinkedIdByName("Organization", spinnerOrgName.getItemAtPosition(spinnerOrgName.getSelectedItemPosition()).toString());
+                                dbh.deleteField("Organization", linked_id);
+                                dbh.deleteField("Address", linked_id);
                                 refreshOrgSpinner();
                                 refreshAddrSpinner();
                                 if (spinnerOrgName.getCount() > 0)
-                                    spinnerOrgName.setSelection(spinnerOrgName.getCount() - 1);
+                                    spinnerOrgName.setSelection(spinnerPosition - 1);
                             }
                         })
                         .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
@@ -263,6 +267,35 @@ public class MainActivity extends AppCompatActivity
                             }
                         }).show();
             }
+        } else
+
+        if (id == R.id.btnAddrDel) {
+            if (spinnerAddrName.getSelectedItemPosition() == -1)
+                Toast.makeText(this, "Удалять нечего!", Toast.LENGTH_SHORT).show();
+            else {
+                new AlertDialog.Builder(this)
+                        .setTitle("Удаление адреса")
+                        .setIcon(R.mipmap.ic_launcher)
+                        .setMessage("Вы точно хотите удалить \"" + spinnerAddrName.getSelectedItem().toString() + "\"?")
+                        .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int i) {
+                                int spinnerPosition = spinnerAddrName.getSelectedItemPosition();
+
+                                dbh.deleteField("Address", spinnerAddrName.getItemAtPosition(spinnerAddrName.getSelectedItemPosition()).toString());
+                                refreshAddrSpinner();
+                                if (spinnerAddrName.getCount() > 0)
+                                    spinnerAddrName.setSelection(spinnerPosition - 1);
+                            }
+                        })
+                        .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int i) {
+                                dialog.cancel();
+                            }
+                        }).show();
+            }
+
         }
     }
 }

@@ -16,19 +16,20 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     ContentValues contentValues = new ContentValues();
 
     public DataBaseHelper(Context context) {
-        super(context, "dBase", null, 1);
+        super(context, "dBase.db", null, 1);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS Organization (" +
-                "org_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
-                "name TEXT NOT NULL);");
+                "id INTEGER NOT NULL PRIMARY KEY," +
+                "name TEXT NOT NULL," +
+                "linked_id INTEGER NOT NULL);");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS Address (" +
-                "address_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
-                "name TEXT NOT NULL, " +
-                "org_id INTEGER NOT NULL);");
+                "id INTEGER NOT NULL PRIMARY KEY," +
+                "name TEXT NOT NULL," +
+                "linked_id INTEGER NOT NULL);");
     }
 
     @Override
@@ -36,41 +37,68 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         //
     }
 
-    public void addField(String table, String name) {
+
+    // Добавление поля и связующего ключа (для организации)
+    public void addField(String table, String name, int linked_id) {
 
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
 
         contentValues.put("name", name);
-
-        sqLiteDatabase.insert(table, null, contentValues);
-
-        sqLiteDatabase.close();
-    }
-
-    public void addField(String table, String name, int org_id) {
-        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
-
-        contentValues.put("name", name);
-        contentValues.put("org_id", org_id);
+        contentValues.put("linked_id", linked_id);
 
         sqLiteDatabase.insert(table, null, contentValues);
         sqLiteDatabase.close();
     }
 
-    public void deleteField(String table, int id) {
+    // Удаление поля по связующей ссылке (для организации)
+    public void deleteField(String table, int linked_id) {
+
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
 
-        sqLiteDatabase.delete(table, "org_id = " + id, null);
+        sqLiteDatabase.delete(table, "linked_id = " + linked_id, null);
         sqLiteDatabase.close();
+    }
+
+    // Удаление поля по имени (для адреса)
+    public void deleteField(String table, String name) {
+
+        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
+
+        sqLiteDatabase.delete(table, "name = \"" + name + "\"", null);
+        sqLiteDatabase.close();
+    }
+
+    // поиск связующего ключа по имени
+    public int getLinkedIdByName(String table, String name) {
+
+        int result = 0;
+
+        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + table, null);
+
+        if (cursor.moveToFirst()) {
+            int nameColIndex = cursor.getColumnIndex("name");
+            int linkedIdColIndex = cursor.getColumnIndex("linked_id");
+
+            do {
+                if (name.equals(cursor.getString(nameColIndex)))
+                    return cursor.getInt(linkedIdColIndex);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        sqLiteDatabase.close();
+        return result;
 
     }
 
+    // Сбор и возврат всех значений имен из заданой таблицы
     public ArrayList<String> getAllValues(String table) {
 
         ArrayList<String> result = new ArrayList<>();
-        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
 
-        Cursor cursor = sqLiteDatabase.query(table, null, null, null, null, null, null);
+        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + table, null);
 
         if (cursor.moveToFirst()) {
             int nameColIndex = cursor.getColumnIndex("name");
@@ -86,18 +114,20 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    public ArrayList<String> getAllValues(String table, int org_id) {
-        ArrayList<String> result = new ArrayList<>();
-        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+    // Сбор и возврат всех значений имен из заданой таблицы по связующему ключу
+    public ArrayList<String> getAllValues(String table, int linked_id) {
 
-        Cursor cursor = sqLiteDatabase.query(table, null, null, null, null, null, null);
+        ArrayList<String> result = new ArrayList<>();
+
+        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + table, null);
 
         if (cursor.moveToFirst()) {
-            int idColIndex = cursor.getColumnIndex("org_id");
+            int linkedIdColIndex = cursor.getColumnIndex("linked_id");
             int nameColIndex = cursor.getColumnIndex("name");
 
             do {
-                if (cursor.getInt(idColIndex) == org_id)
+                if (cursor.getInt(linkedIdColIndex) == linked_id)
                     result.add(cursor.getString(nameColIndex));
             } while (cursor.moveToNext());
         }
@@ -108,11 +138,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
+    // проверка на идентичность имени
     public boolean identityVerification(String table, String name) {
 
         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
-
-        Cursor cursor = sqLiteDatabase.query(table, null, null, null, null, null, null);
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + table, null);
 
         if (cursor.moveToFirst()) {
             int nameColIndex = cursor.getColumnIndex("name");
@@ -127,5 +157,53 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.close();
 
         return false;
+    }
+
+    // поиск свободного связующего ключа
+    public int findFreeLinedId() {
+
+        int newLinkedId = 0;
+
+        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM Organization;", null);
+
+        if (cursor.getCount() > 0) {
+
+            int[] linkedIdArray = new int[cursor.getCount()];
+            int linkedIdColIndex = cursor.getColumnIndex("linked_id");
+
+            // заполнение массива всеми имеющимися связными ключами
+            if (cursor.moveToFirst()) {
+                for (int i = 0; i < cursor.getCount(); i++) {
+                    linkedIdArray[i] = cursor.getInt(linkedIdColIndex);
+                    cursor.moveToNext();
+                }
+
+                // нахождение свободного связующего ключа
+                boolean b = false;
+                while (!b) {
+                    newLinkedId++;
+
+                    for (int i = 0; i < linkedIdArray.length; i++) {
+                        if (newLinkedId == linkedIdArray[i]) {
+                            b = false;
+                            break;
+                        } else b = true;
+
+                        if (i == linkedIdArray.length - 1 && b) {
+                            cursor.close();
+                            sqLiteDatabase.close();
+                            return newLinkedId;
+                        }
+                    }
+                }
+            }
+
+        } else newLinkedId = 1;
+
+        cursor.close();
+        sqLiteDatabase.close();
+
+        return newLinkedId;
     }
 }
