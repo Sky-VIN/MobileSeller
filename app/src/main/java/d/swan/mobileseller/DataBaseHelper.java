@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -160,7 +161,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     // поиск свободного связующего ключа
-    public int findFreeLinedId() {
+    public int findFreeLinkedId() {
 
         int newLinkedId = 0;
 
@@ -180,23 +181,17 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 }
 
                 // нахождение свободного связующего ключа
-                boolean b = false;
-                while (!b) {
+                boolean b;
+                do {
+                    b = false;
                     newLinkedId++;
 
-                    for (int i = 0; i < linkedIdArray.length; i++) {
+                    for (int i : linkedIdArray)
                         if (newLinkedId == linkedIdArray[i]) {
-                            b = false;
+                            b = true;
                             break;
-                        } else b = true;
-
-                        if (i == linkedIdArray.length - 1 && b) {
-                            cursor.close();
-                            sqLiteDatabase.close();
-                            return newLinkedId;
                         }
-                    }
-                }
+                } while (b);
             }
 
         } else newLinkedId = 1;
@@ -205,5 +200,25 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.close();
 
         return newLinkedId;
+    }
+
+    // Вывод в лог всез полей
+    public void getAllLog(String table) {
+        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + table, null);
+
+        if (cursor.moveToFirst()) {
+            int idColIndex = cursor.getColumnIndex("id");
+            int nameColInex = cursor.getColumnIndex("name");
+            int linkedIdColIndex = cursor.getColumnIndex("linked_id");
+
+            Log.d("Mseller", "- - - - - - - - - - - - - - - - - - - - - - - - -");
+            do {
+                Log.d("Mseller", "id = " + cursor.getInt(idColIndex) + "\tname = " + cursor.getString(nameColInex) + "\tlinked_id = " + cursor.getInt(linkedIdColIndex));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        sqLiteDatabase.close();
     }
 }

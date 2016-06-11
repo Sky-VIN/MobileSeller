@@ -20,7 +20,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, AdapterView.OnItemSelectedListener, View.OnClickListener {
@@ -31,12 +30,10 @@ public class MainActivity extends AppCompatActivity
     ArrayAdapter<String> orgAdapter;
     ArrayAdapter<String> addrAdapter;
 
-
-
     Spinner spinnerOrgName, spinnerAddrName;
     Button btnNewPrice, btnOrgAdd, btnAddrAdd, btnOrgDel, btnAddrDel;
 
-    DataBaseHelper dbh = new DataBaseHelper(this);
+    DataBaseHelper dbHelper = new DataBaseHelper(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,67 +82,67 @@ public class MainActivity extends AppCompatActivity
 
     private void refreshOrgSpinner() {
         org.clear();
-        org.addAll(dbh.getAllValues("Organization"));
+        org.addAll(dbHelper.getAllValues("Organization"));
 
         orgAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, org);
         orgAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        orgAdapter.notifyDataSetChanged();
         spinnerOrgName.setAdapter(orgAdapter);
+        orgAdapter.notifyDataSetChanged();
     }
 
     private void refreshAddrSpinner() {
         addr.clear();
-        if (spinnerOrgName.getSelectedItemPosition() > -1)
-            addr.addAll(dbh.getAllValues("Address", dbh.getLinkedIdByName("Organization", spinnerOrgName.getItemAtPosition(spinnerOrgName.getSelectedItemPosition()).toString())));
+        if (spinnerOrgName.getSelectedItemPosition() >= 0)
+            addr.addAll(dbHelper.getAllValues("Address",
+                    dbHelper.getLinkedIdByName("Organization",
+                            spinnerOrgName.getItemAtPosition(spinnerOrgName.getSelectedItemPosition()).toString())));
 
         addrAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, addr);
         addrAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        addrAdapter.notifyDataSetChanged();
         spinnerAddrName.setAdapter(addrAdapter);
+        addrAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
+        if (drawer.isDrawerOpen(GravityCompat.START))
             drawer.closeDrawer(GravityCompat.START);
-        } else {
-            // Nothing
-        }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
 
         int id = item.getItemId();
 
+        // Кнопка "Обновить"
         if (id == R.id.nav_update) {
             Toast.makeText(this, "Кнопка пока не работает...", Toast.LENGTH_SHORT).show();
-
-        } else if (id == R.id.nav_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-
-        } else if (id == R.id.nav_exit) {
-            new AlertDialog.Builder(this)
-                    .setIcon(R.mipmap.ic_launcher)
-                    .setTitle(R.string.app_name)
-                    .setMessage("Подтвердите выход")
-                    .setPositiveButton("Да", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
-                    })
-                    .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    }).show();
-        }
-
+        } else
+            // Кнопка "Настройки"
+            if (id == R.id.nav_settings) {
+                startActivity(new Intent(this, SettingsActivity.class));
+            } else
+                // Кнопка "Выход"
+                if (id == R.id.nav_exit) {
+                    new AlertDialog.Builder(this)
+                            .setIcon(R.mipmap.ic_launcher)
+                            .setTitle(R.string.app_name)
+                            .setMessage("Подтвердите выход")
+                            .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    finish();
+                                }
+                            })
+                            .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            }).show();
+                }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -154,79 +151,48 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) throws NullPointerException {
-
-        if(adapterView.getId() == R.id.spinnerOrgName)
+        if (adapterView.getId() == R.id.spinnerOrgName)
             refreshAddrSpinner();
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
-
+        // Nothing
     }
 
     @Override
     public void onClick(View view) {
+
         int id = view.getId();
 
+        // Нажатие на кнопку Создать (Price)
         if (id == R.id.btnNewPrice) {
             if (spinnerOrgName.getSelectedItemPosition() == -1 || spinnerAddrName.getSelectedItemPosition() == -1)
                 Toast.makeText(this, "Не выбран один из пунктов!", Toast.LENGTH_SHORT).show();
             else
                 startActivity(new Intent(this, PriceActivity.class));
         } else
-
-        if (id == R.id.btnOrgAdd) {
-
-            final EditText eText = new EditText(this);
-            new AlertDialog.Builder(this)
-                    .setTitle("Добавление организации")
-                    .setIcon(R.mipmap.ic_launcher)
-                    .setView(eText)
-                    .setPositiveButton("Добавить", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int i) {
-                            if (!eText.getText().toString().equals("")) {
-                                if (!dbh.identityVerification("Organization", eText.getText().toString())) {
-                                    dbh.addField("Organization", eText.getText().toString(), dbh.findFreeLinedId());
-                                    refreshOrgSpinner();
-                                    refreshAddrSpinner();
-                                    if (spinnerOrgName.getCount() > 0)
-                                        spinnerOrgName.setSelection(spinnerOrgName.getCount() - 1);
-                                }
-                                else
-                                    Toast.makeText(getApplicationContext(), "Такая организайия уже есть!", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    })
-                    .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int i) {
-                            dialog.cancel();
-                        }
-                    }).show();
-        } else
-
-        if (id == R.id.btnAddrAdd) {
-            if (spinnerOrgName.getSelectedItemPosition() == -1)
-                Toast.makeText(this, "Не выбрана организация!", Toast.LENGTH_SHORT).show();
-            else {
+            // Нажатие на кнопку "Добавть организацию"
+            if (id == R.id.btnOrgAdd) {
                 final EditText eText = new EditText(this);
+                eText.setFocusable(true);
                 new AlertDialog.Builder(this)
-                        .setTitle("Добавление адреса")
+                        .setTitle("Добавление организации")
                         .setIcon(R.mipmap.ic_launcher)
                         .setView(eText)
                         .setPositiveButton("Добавить", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
                                 if (!eText.getText().toString().equals("")) {
-                                    if (!dbh.identityVerification("Address", eText.getText().toString())) {
-                                        int linked_id = dbh.getLinkedIdByName("Organization", spinnerOrgName.getItemAtPosition(spinnerOrgName.getSelectedItemPosition()).toString());
-                                        dbh.addField("Address", eText.getText().toString(), linked_id);
+                                    // Проверка на идентичность имени
+                                    if (!dbHelper.identityVerification("Organization", eText.getText().toString())) {
+                                        dbHelper.addField("Organization", eText.getText().toString(), dbHelper.findFreeLinkedId());
+                                        refreshOrgSpinner();
                                         refreshAddrSpinner();
-                                        if (spinnerAddrName.getCount() > 0)
-                                            spinnerAddrName.setSelection(spinnerAddrName.getCount() - 1);
+                                        if (spinnerOrgName.getCount() > 0)
+                                            spinnerOrgName.setSelection(spinnerOrgName.getCount() - 1);
                                     } else
-                                        Toast.makeText(getApplicationContext(), "Такой адрес уже есть!", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getApplicationContext(), "Такая организайия уже есть!", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         })
@@ -236,66 +202,101 @@ public class MainActivity extends AppCompatActivity
                                 dialog.cancel();
                             }
                         }).show();
-            }
-        } else
-
-        if (id == R.id.btnOrgDel) {
-            if (spinnerOrgName.getSelectedItemPosition() == -1)
-                Toast.makeText(this, "Удалять нечего!", Toast.LENGTH_SHORT).show();
-            else {
-                new AlertDialog.Builder(this)
-                        .setTitle("Удаление организации")
-                        .setIcon(R.mipmap.ic_launcher)
-                        .setMessage("Вы точно хотите удалить \"" + spinnerOrgName.getSelectedItem().toString() + "\"?")
-                        .setPositiveButton("Да", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int i) {
-                                int spinnerPosition = spinnerOrgName.getSelectedItemPosition();
-                                int linked_id = dbh.getLinkedIdByName("Organization", spinnerOrgName.getItemAtPosition(spinnerOrgName.getSelectedItemPosition()).toString());
-                                dbh.deleteField("Organization", linked_id);
-                                dbh.deleteField("Address", linked_id);
-                                refreshOrgSpinner();
-                                refreshAddrSpinner();
-                                if (spinnerOrgName.getCount() > 0)
-                                    spinnerOrgName.setSelection(spinnerPosition - 1);
+            } else
+                // Нажатие на кнопку "Добавть адрес"
+                if (id == R.id.btnAddrAdd) {
+                    if (spinnerOrgName.getSelectedItemPosition() == -1)
+                        Toast.makeText(this, "Не выбрана организация!", Toast.LENGTH_SHORT).show();
+                    else {
+                        final EditText eText = new EditText(this);
+                        eText.setFocusable(true);
+                        new AlertDialog.Builder(this)
+                                .setTitle("Добавление адреса")
+                                .setIcon(R.mipmap.ic_launcher)
+                                .setView(eText)
+                                .setPositiveButton("Добавить", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int i) {
+                                        if (!eText.getText().toString().equals("")) {
+                                            // Проверка на идентичность имени
+                                            if (!dbHelper.identityVerification("Address", eText.getText().toString())) {
+                                                int linked_id = dbHelper.getLinkedIdByName("Organization",
+                                                        spinnerOrgName.getItemAtPosition(spinnerOrgName.getSelectedItemPosition()).toString());
+                                                dbHelper.addField("Address", eText.getText().toString(), linked_id);
+                                                refreshAddrSpinner();
+                                                if (spinnerAddrName.getCount() > 0)
+                                                    spinnerAddrName.setSelection(spinnerAddrName.getCount() - 1);
+                                            } else
+                                                Toast.makeText(getApplicationContext(), "Такой адрес уже есть!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                })
+                                .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int i) {
+                                        dialog.cancel();
+                                    }
+                                }).show();
+                    }
+                } else
+                    // Нажатие на кнопку "Удалить организацию"
+                    if (id == R.id.btnOrgDel) {
+                        if (spinnerOrgName.getSelectedItemPosition() == -1)
+                            Toast.makeText(this, "Удалять нечего!", Toast.LENGTH_SHORT).show();
+                        else {
+                            new AlertDialog.Builder(this)
+                                    .setTitle("Удаление организации")
+                                    .setIcon(R.mipmap.ic_launcher)
+                                    .setMessage("Вы точно хотите удалить \"" + spinnerOrgName.getSelectedItem().toString() + "\"?")
+                                    .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int i) {
+                                            int spinnerPosition = spinnerOrgName.getSelectedItemPosition();
+                                            int linked_id = dbHelper.getLinkedIdByName("Organization",
+                                                    spinnerOrgName.getItemAtPosition(spinnerOrgName.getSelectedItemPosition()).toString());
+                                            dbHelper.deleteField("Organization", linked_id);
+                                            dbHelper.deleteField("Address", linked_id);
+                                            refreshOrgSpinner();
+                                            refreshAddrSpinner();
+                                            if (spinnerOrgName.getCount() > 0)
+                                                spinnerOrgName.setSelection(spinnerPosition - 1);
+                                        }
+                                    })
+                                    .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int i) {
+                                            dialog.cancel();
+                                        }
+                                    }).show();
+                        }
+                    } else
+                        // Нажатие на кнопку "Удалить адрес"
+                        if (id == R.id.btnAddrDel) {
+                            if (spinnerAddrName.getSelectedItemPosition() == -1)
+                                Toast.makeText(this, "Удалять нечего!", Toast.LENGTH_SHORT).show();
+                            else {
+                                new AlertDialog.Builder(this)
+                                        .setTitle("Удаление адреса")
+                                        .setIcon(R.mipmap.ic_launcher)
+                                        .setMessage("Вы точно хотите удалить \"" + spinnerAddrName.getSelectedItem().toString() + "\"?")
+                                        .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int i) {
+                                                int spinnerPosition = spinnerAddrName.getSelectedItemPosition();
+                                                dbHelper.deleteField("Address",
+                                                        spinnerAddrName.getItemAtPosition(spinnerAddrName.getSelectedItemPosition()).toString());
+                                                refreshAddrSpinner();
+                                                if (spinnerAddrName.getCount() > 0)
+                                                    spinnerAddrName.setSelection(spinnerPosition - 1);
+                                            }
+                                        })
+                                        .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int i) {
+                                                dialog.cancel();
+                                            }
+                                        }).show();
                             }
-                        })
-                        .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int i) {
-                                dialog.cancel();
-                            }
-                        }).show();
-            }
-        } else
-
-        if (id == R.id.btnAddrDel) {
-            if (spinnerAddrName.getSelectedItemPosition() == -1)
-                Toast.makeText(this, "Удалять нечего!", Toast.LENGTH_SHORT).show();
-            else {
-                new AlertDialog.Builder(this)
-                        .setTitle("Удаление адреса")
-                        .setIcon(R.mipmap.ic_launcher)
-                        .setMessage("Вы точно хотите удалить \"" + spinnerAddrName.getSelectedItem().toString() + "\"?")
-                        .setPositiveButton("Да", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int i) {
-                                int spinnerPosition = spinnerAddrName.getSelectedItemPosition();
-
-                                dbh.deleteField("Address", spinnerAddrName.getItemAtPosition(spinnerAddrName.getSelectedItemPosition()).toString());
-                                refreshAddrSpinner();
-                                if (spinnerAddrName.getCount() > 0)
-                                    spinnerAddrName.setSelection(spinnerPosition - 1);
-                            }
-                        })
-                        .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int i) {
-                                dialog.cancel();
-                            }
-                        }).show();
-            }
-
-        }
+                        }
     }
 }
