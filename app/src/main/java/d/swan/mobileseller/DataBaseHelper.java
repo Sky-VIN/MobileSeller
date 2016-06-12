@@ -31,6 +31,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 "id INTEGER NOT NULL PRIMARY KEY," +
                 "name TEXT NOT NULL," +
                 "linked_id INTEGER NOT NULL);");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS Price (" +
+                "id INTEGER NOT NULL PRIMARY KEY," +
+                "name TEXT NOT NULL," +
+                "wholesale_price REAL NOT NULL," +
+                "retail_price REAL NOT NULL);");
+
     }
 
     @Override
@@ -220,5 +227,44 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
         sqLiteDatabase.close();
+    }
+
+    public void setPrice(String name, float wholescapePrice, float retailPrice) {
+        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
+
+        contentValues.put("name", name);
+        contentValues.put("wholesale_price", wholescapePrice);
+        contentValues.put("retail_price", retailPrice);
+
+        sqLiteDatabase.insert("Price", null, contentValues);
+        sqLiteDatabase.close();
+    }
+
+    public void getPrice(boolean isRetail) {
+//        ArrayList<Point> price = new ArrayList<>();
+
+        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM Price", null);
+
+        if (cursor.moveToFirst()) {
+            int nameColIndex = cursor.getColumnIndex("name");
+            int wholesalePriceColIndex = cursor.getColumnIndex("wholesale_price");
+            int retailPriceColIndex = cursor.getColumnIndex("retail_price");
+
+            do {
+                Log.d("Mseller", cursor.getString(nameColIndex) + "\t" + cursor.getFloat(wholesalePriceColIndex) + "\t" + cursor.getFloat(retailPriceColIndex));
+/*
+                if (isRetail)
+                    price.add(new Point(cursor.getString(nameColIndex), cursor.getFloat(retailPriceColIndex), 0, 0));
+                else
+                    price.add(new Point(cursor.getString(nameColIndex), cursor.getFloat(wholesalePriceColIndex), 0, 0));
+*/
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        sqLiteDatabase.close();
+
+        // return price;
     }
 }

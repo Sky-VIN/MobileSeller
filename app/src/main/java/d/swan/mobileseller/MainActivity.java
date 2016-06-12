@@ -2,6 +2,7 @@ package d.swan.mobileseller;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -10,6 +11,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,7 +21,11 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, AdapterView.OnItemSelectedListener, View.OnClickListener {
@@ -118,7 +124,10 @@ public class MainActivity extends AppCompatActivity
 
         // Кнопка "Обновить"
         if (id == R.id.nav_update) {
-            Toast.makeText(this, "Кнопка пока не работает...", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("file/*");
+            startActivityForResult(intent, 1);
+            // Toast.makeText(this, "Кнопка пока не работает...", Toast.LENGTH_SHORT).show();
         } else
             // Кнопка "Настройки"
             if (id == R.id.nav_settings) {
@@ -298,5 +307,20 @@ public class MainActivity extends AppCompatActivity
                                         }).show();
                             }
                         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(data == null)
+            return;
+        File file = new File(data.getData().toString());
+        String sub = file.getPath().substring(5, file.getPath().length());
+        ExcelWorker worker = new ExcelWorker();
+        try {
+            worker.readFromExcel(getApplicationContext(), sub);
+        } catch (IOException e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

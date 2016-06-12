@@ -16,7 +16,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Save"
-            android:id="@+id/btnSavePrice" />
+            android:id="@+id/btnSavePrice"
+            android:background="@android:drawable/btn_default" />
 
         <TextView
             android:layout_width="match_parent"
@@ -36,24 +37,15 @@
 
     </LinearLayout>
 
-    <View
-        android:layout_width="wrap_content"
-        android:background="@drawable/devider"
-        android:layout_height="1dp">
-    </View>
-
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/selectedPriceList"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="1" />
-
-    <View
-        android:layout_width="wrap_content"
-        android:background="@drawable/devider"
-        android:layout_height="1dp">
-    </View>
+        android:layout_weight="1"
+        android:divider="@drawable/devider"
+        android:background="@android:drawable/edit_text"
+        android:dividerHeight="1dip" />
 
 <!--
     <LinearLayout

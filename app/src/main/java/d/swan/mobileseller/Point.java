@@ -9,13 +9,11 @@ import android.os.Parcelable;
 public class Point implements Parcelable {
 
     String name;
-    int hatch, article, amount;
+    int amount;
     float priceUnit, priceTotal;
 
-    Point(String name, int hatch, int article, float priceUnit, float priceTotal, int amount) {
+    Point(String name, float priceUnit, float priceTotal, int amount) {
         this.name = name;
-        this.hatch = hatch;
-        this.article = article;
         this.priceUnit = priceUnit;
         this.priceTotal = priceTotal;
         this.amount = amount;
@@ -23,8 +21,6 @@ public class Point implements Parcelable {
 
     private Point(Parcel in) {
         this.name = in.readString();
-        this.hatch = in.readInt();
-        this.article = in.readInt();
         this.amount = in.readInt();
         this.priceUnit = in.readFloat();
         this.priceTotal = in.readFloat();
@@ -50,8 +46,6 @@ public class Point implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(name);
-        parcel.writeInt(hatch);
-        parcel.writeInt(article);
         parcel.writeInt(amount);
         parcel.writeFloat(priceUnit);
         parcel.writeFloat(priceTotal);
