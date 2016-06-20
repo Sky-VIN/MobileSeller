@@ -22,4 +22,9 @@ public class SettingsActivity extends AppCompatActivity {
             finish();
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onBackPressed() {
+        // nothing
+    }
 }

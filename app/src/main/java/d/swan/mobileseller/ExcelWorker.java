@@ -64,58 +64,22 @@ public final class ExcelWorker {
         cell = row.createCell(0);
         cell.setCellValue("Адрес: " + address);
 
-        emptyRow();
 
         // строка оглавления
-        row = sheet.createRow(++rowNum);
-        cell = row.createCell(0);
-        cell.setCellValue("Наименование");
-        cell.setCellStyle(styleBold);
-
-        cell = row.createCell(1);
-        cell.setCellValue("Цена");
-        cell.setCellStyle(styleBold);
-
-        cell = row.createCell(2);
-        cell.setCellValue("шт");
-        cell.setCellStyle(styleBold);
-
-        cell = row.createCell(3);
-        cell.setCellValue("Сумма");
-        cell.setCellStyle(styleBold);
-
+        rowFill(styleBold, "Наименование", "Цена", "шт", "Сумма");
 
         // заполнение листа данными
-        for (Point point : priceArray) {
-            row = sheet.createRow(++rowNum);
+        for (Point point : priceArray)
+            rowFill(styleNormal, point.name,
+                    String.valueOf(new Rounding().round_up(point.priceUnit)),
+                    String.valueOf(new Rounding().round_up(point.amount)),
+                    String.valueOf(new Rounding().round_up(point.priceTotal))
+            );
 
-            cell = row.createCell(0);
-            cell.setCellValue(point.name);
-            cell.setCellStyle(styleNormal);
-
-            cell = row.createCell(1);
-            cell.setCellValue(new Rounding().round_up(point.priceUnit));
-            cell.setCellStyle(styleNormal);
-
-            cell = row.createCell(2);
-            cell.setCellValue(point.amount);
-            cell.setCellStyle(styleNormal);
-
-            cell = row.createCell(3);
-            cell.setCellValue(new Rounding().round_up(point.priceTotal));
-            cell.setCellStyle(styleNormal);
-        }
-
-        emptyRow();
-
+        // пустая строка
+        rowFill(styleNormal, "", "", "", "");
         // строка итога
-        row = sheet.createRow(++rowNum);
-        cell = row.createCell(0);
-        cell.setCellValue("ИТОГ:");
-        cell.setCellStyle(styleBold);
-        cell = row.createCell(3);
-        cell.setCellValue(summary);
-        cell.setCellStyle(styleBold);
+        rowFill(styleBold, "ИТОГ:", "", "", String.valueOf(summary));
 
         // запись созданного в памяти Excel документа в файл
         File dir = new File("/sdcard/Mobile Seller");
@@ -130,12 +94,13 @@ public final class ExcelWorker {
         return ("/sdcard/Mobile Seller/" + datetime + ".xls");
     }
 
-    // пустая строка (отступ)
-    private static void emptyRow() {
+    private static void rowFill(CellStyle style, String... args) {
         row = sheet.createRow(++rowNum);
-        for (int i = 0; i <= 3; i++) {
-            cell = row.createCell(i);
-            cell.setCellStyle(styleNormal);
+        int count = 0;
+        for (String s : args) {
+            cell = row.createCell(count++);
+            cell.setCellValue(s);
+            cell.setCellStyle(style);
         }
     }
 
