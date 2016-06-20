@@ -5,14 +5,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by daniel on 6/9/16.
  */
-public class DataBaseHelper extends SQLiteOpenHelper {
+public final class DataBaseHelper extends SQLiteOpenHelper {
 
     ContentValues contentValues = new ContentValues();
 
@@ -101,9 +101,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     // Сбор и возврат всех значений имен из заданой таблицы
-    public ArrayList<String> getAllValues(String table) {
+    public List<String> getAllValues(String table) {
 
-        ArrayList<String> result = new ArrayList<>();
+        List<String> result = new ArrayList();
 
         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + table, null);
@@ -111,6 +111,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             int nameColIndex = cursor.getColumnIndex("name");
 
+            int i = 0;
             do {
                 result.add(cursor.getString(nameColIndex));
             } while (cursor.moveToNext());
@@ -123,9 +124,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     // Сбор и возврат всех значений имен из заданой таблицы по связующему ключу
-    public ArrayList<String> getAllValues(String table, int linked_id) {
+    public List<String> getAllValues(String table, int linked_id) {
 
-        ArrayList<String> result = new ArrayList<>();
+        List<String> result = new ArrayList<>();
 
         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + table, null);
@@ -134,6 +135,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             int linkedIdColIndex = cursor.getColumnIndex("linked_id");
             int nameColIndex = cursor.getColumnIndex("name");
 
+            int i = 0;
             do {
                 if (cursor.getInt(linkedIdColIndex) == linked_id)
                     result.add(cursor.getString(nameColIndex));
@@ -209,7 +211,52 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return newLinkedId;
     }
 
-    // Вывод в лог всез полей
+    // сбор списка с розничными ценами
+    public ArrayList<Point> getRetailPrice() {
+        ArrayList<Point> priceArray = new ArrayList<>();
+
+        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM Price", null);
+
+        if (cursor.moveToFirst()) {
+            int nameColIndex = cursor.getColumnIndex("name");
+            int priceColIndex = cursor.getColumnIndex("retail_price");
+
+            do {
+                priceArray.add(new Point(cursor.getString(nameColIndex), cursor.getFloat(priceColIndex), 0, 0));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        sqLiteDatabase.close();
+
+        return priceArray;
+    }
+
+    // сбор списка с оптовыми ценами
+    public ArrayList<Point> getWholesalePrice() {
+        ArrayList<Point> priceArray = new ArrayList<>();
+
+        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM Price", null);
+
+        if (cursor.moveToFirst()) {
+            int nameColIndex = cursor.getColumnIndex("name");
+            int priceColIndex = cursor.getColumnIndex("wholesale_price");
+
+            do {
+                priceArray.add(new Point(cursor.getString(nameColIndex), cursor.getFloat(priceColIndex), 0, 0));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        sqLiteDatabase.close();
+
+        return priceArray;
+    }
+
+    // Вывод в лог всех полей
+/*
     public void getAllLog(String table) {
         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + table, null);
@@ -229,6 +276,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.close();
     }
 
+    public void deletePrice() {
+        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
+        sqLiteDatabase.execSQL("DELETE FROM Price");
+        sqLiteDatabase.close();
+    }
+
     public void setPrice(String name, float wholescapePrice, float retailPrice) {
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
 
@@ -239,32 +292,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.insert("Price", null, contentValues);
         sqLiteDatabase.close();
     }
-
-    public void getPrice(boolean isRetail) {
-//        ArrayList<Point> price = new ArrayList<>();
-
-        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
-        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM Price", null);
-
-        if (cursor.moveToFirst()) {
-            int nameColIndex = cursor.getColumnIndex("name");
-            int wholesalePriceColIndex = cursor.getColumnIndex("wholesale_price");
-            int retailPriceColIndex = cursor.getColumnIndex("retail_price");
-
-            do {
-                Log.d("Mseller", cursor.getString(nameColIndex) + "\t" + cursor.getFloat(wholesalePriceColIndex) + "\t" + cursor.getFloat(retailPriceColIndex));
-/*
-                if (isRetail)
-                    price.add(new Point(cursor.getString(nameColIndex), cursor.getFloat(retailPriceColIndex), 0, 0));
-                else
-                    price.add(new Point(cursor.getString(nameColIndex), cursor.getFloat(wholesalePriceColIndex), 0, 0));
 */
-            } while (cursor.moveToNext());
-        }
 
-        cursor.close();
-        sqLiteDatabase.close();
-
-        // return price;
-    }
 }
+
+

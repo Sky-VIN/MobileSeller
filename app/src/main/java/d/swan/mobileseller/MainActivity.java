@@ -2,7 +2,6 @@ package d.swan.mobileseller;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -11,31 +10,29 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.zip.Inflater;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, AdapterView.OnItemSelectedListener, View.OnClickListener {
 
-    ArrayList<String> org = new ArrayList<>();
-    ArrayList<String> addr = new ArrayList<>();
+    List<String> orgArray = new ArrayList<>();
+    List<String> addrArray = new ArrayList<>();
 
     ArrayAdapter<String> orgAdapter;
     ArrayAdapter<String> addrAdapter;
 
+    RadioButton radioRetail, radioWholesale;
     Spinner spinnerOrgName, spinnerAddrName;
     Button btnNewPrice, btnOrgAdd, btnAddrAdd, btnOrgDel, btnAddrDel;
 
@@ -59,6 +56,9 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        radioRetail = (RadioButton) findViewById(R.id.radioRetail);
+        radioWholesale = (RadioButton) findViewById(R.id.radioWholesale);
 
         btnNewPrice = (Button) findViewById(R.id.btnNewPrice);
         btnNewPrice.setOnClickListener(this);
@@ -87,23 +87,23 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void refreshOrgSpinner() {
-        org.clear();
-        org.addAll(dbHelper.getAllValues("Organization"));
+        orgArray.clear();
+        orgArray.addAll(dbHelper.getAllValues("Organization"));
 
-        orgAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, org);
+        orgAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, orgArray);
         orgAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerOrgName.setAdapter(orgAdapter);
         orgAdapter.notifyDataSetChanged();
     }
 
     private void refreshAddrSpinner() {
-        addr.clear();
-        if (spinnerOrgName.getSelectedItemPosition() >= 0)
-            addr.addAll(dbHelper.getAllValues("Address",
-                    dbHelper.getLinkedIdByName("Organization",
-                            spinnerOrgName.getItemAtPosition(spinnerOrgName.getSelectedItemPosition()).toString())));
+        addrArray.clear();
+        if (spinnerOrgName.getSelectedItemPosition() > -1) {
+            int linked_id = dbHelper.getLinkedIdByName("Organization", spinnerOrgName.getSelectedItem().toString());
+            addrArray.addAll(dbHelper.getAllValues("Address", linked_id));
+        }
 
-        addrAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, addr);
+        addrAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, addrArray);
         addrAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerAddrName.setAdapter(addrAdapter);
         addrAdapter.notifyDataSetChanged();
@@ -124,10 +124,13 @@ public class MainActivity extends AppCompatActivity
 
         // Кнопка "Обновить"
         if (id == R.id.nav_update) {
+/*
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("file/*");
+            intent.setType("file*/
+/*");
             startActivityForResult(intent, 1);
-            // Toast.makeText(this, "Кнопка пока не работает...", Toast.LENGTH_SHORT).show();
+*/
+            Toast.makeText(this, "Кнопка пока не работает...", Toast.LENGTH_SHORT).show();
         } else
             // Кнопка "Настройки"
             if (id == R.id.nav_settings) {
@@ -178,8 +181,21 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.btnNewPrice) {
             if (spinnerOrgName.getSelectedItemPosition() == -1 || spinnerAddrName.getSelectedItemPosition() == -1)
                 Toast.makeText(this, "Не выбран один из пунктов!", Toast.LENGTH_SHORT).show();
-            else
-                startActivity(new Intent(this, PriceActivity.class));
+            else {
+                Intent intent = new Intent(this, PriceActivity.class);
+                intent.putExtra("org", spinnerOrgName.getSelectedItem().toString());
+                intent.putExtra("addr", spinnerAddrName.getSelectedItem().toString());
+
+                if (radioRetail.isChecked()) {
+                    intent.putExtra("price", "Розничная");
+                    intent.putParcelableArrayListExtra("PriceList", dbHelper.getRetailPrice());
+                } else {
+                    intent.putExtra("price", "Оптовая");
+                    intent.putParcelableArrayListExtra("PriceList", dbHelper.getWholesalePrice());
+                }
+
+                startActivity(intent);
+            }
         } else
             // Нажатие на кнопку "Добавть организацию"
             if (id == R.id.btnOrgAdd) {
@@ -229,8 +245,7 @@ public class MainActivity extends AppCompatActivity
                                         if (!eText.getText().toString().equals("")) {
                                             // Проверка на идентичность имени
                                             if (!dbHelper.identityVerification("Address", eText.getText().toString())) {
-                                                int linked_id = dbHelper.getLinkedIdByName("Organization",
-                                                        spinnerOrgName.getItemAtPosition(spinnerOrgName.getSelectedItemPosition()).toString());
+                                                int linked_id = dbHelper.getLinkedIdByName("Organization", spinnerOrgName.getSelectedItem().toString());
                                                 dbHelper.addField("Address", eText.getText().toString(), linked_id);
                                                 refreshAddrSpinner();
                                                 if (spinnerAddrName.getCount() > 0)
@@ -260,15 +275,13 @@ public class MainActivity extends AppCompatActivity
                                     .setPositiveButton("Да", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int i) {
-                                            int spinnerPosition = spinnerOrgName.getSelectedItemPosition();
-                                            int linked_id = dbHelper.getLinkedIdByName("Organization",
-                                                    spinnerOrgName.getItemAtPosition(spinnerOrgName.getSelectedItemPosition()).toString());
+                                            int linked_id = dbHelper.getLinkedIdByName("Organization", spinnerOrgName.getSelectedItem().toString());
                                             dbHelper.deleteField("Organization", linked_id);
                                             dbHelper.deleteField("Address", linked_id);
                                             refreshOrgSpinner();
                                             refreshAddrSpinner();
                                             if (spinnerOrgName.getCount() > 0)
-                                                spinnerOrgName.setSelection(spinnerPosition - 1);
+                                                spinnerOrgName.setSelection(spinnerOrgName.getSelectedItemPosition() - 1);
                                         }
                                     })
                                     .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
@@ -291,12 +304,10 @@ public class MainActivity extends AppCompatActivity
                                         .setPositiveButton("Да", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int i) {
-                                                int spinnerPosition = spinnerAddrName.getSelectedItemPosition();
-                                                dbHelper.deleteField("Address",
-                                                        spinnerAddrName.getItemAtPosition(spinnerAddrName.getSelectedItemPosition()).toString());
+                                                dbHelper.deleteField("Address", spinnerAddrName.getSelectedItem().toString());
                                                 refreshAddrSpinner();
                                                 if (spinnerAddrName.getCount() > 0)
-                                                    spinnerAddrName.setSelection(spinnerPosition - 1);
+                                                    spinnerAddrName.setSelection(spinnerAddrName.getSelectedItemPosition() - 1);
                                             }
                                         })
                                         .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
@@ -309,18 +320,20 @@ public class MainActivity extends AppCompatActivity
                         }
     }
 
+/*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(data == null)
+        if (data == null)
             return;
         File file = new File(data.getData().toString());
         String sub = file.getPath().substring(5, file.getPath().length());
         ExcelWorker worker = new ExcelWorker();
         try {
-            worker.readFromExcel(getApplicationContext(), sub);
+            worker.readFromExcel(this, sub);
         } catch (IOException e) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
+*/
 }

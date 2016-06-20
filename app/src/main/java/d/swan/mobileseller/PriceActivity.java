@@ -10,7 +10,6 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,17 +18,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class PriceActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
 
-    String[] names = {"One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
-            "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty"};
 
-    PointAdapter adapter;
-    TextView tvSummary;
+    TextView tvSummary, tvOrganization, tvAddress, tvPrice;
 
-    ArrayList<Point> price = new ArrayList<>();
+    PointAdapter pointAdapter;
+    ArrayList<Point> priceArray = new ArrayList<>();
 
     ListView priceList;
 
@@ -44,19 +40,25 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         tvSummary = (TextView) findViewById(R.id.tvSummary);
+
+        tvOrganization = (TextView) findViewById(R.id.tvOrganization);
+        tvOrganization.setText(getIntent().getStringExtra("org"));
+
+        tvAddress = (TextView) findViewById(R.id.tvAddress);
+        tvAddress.setText(getIntent().getStringExtra("addr"));
+
+        tvPrice = (TextView) findViewById(R.id.tvPrice);
+        tvPrice.setText(getIntent().getStringExtra("price"));
+
         btnCreateList = (Button) findViewById(R.id.btnCreatePrice);
         btnCreateList.setOnClickListener(this);
 
         priceList = (ListView) findViewById(R.id.priceList);
         priceList.setOnItemClickListener(this);
+        priceArray.addAll(getIntent().<Point>getParcelableArrayListExtra("PriceList"));
 
-
-        for (String s : names) {
-            price.add(new Point(s, new Rounding().round_up(new Random().nextFloat() * 1000), 0, 0));
-        }
-
-        adapter = new PointAdapter(this, price);
-        priceList.setAdapter(adapter);
+        pointAdapter = new PointAdapter(this, priceArray);
+        priceList.setAdapter(pointAdapter);
     }
 
     @Override
@@ -86,9 +88,7 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
     public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
         final EditText eText = new EditText(this);
-        eText.setText(String.valueOf(adapter.getPoint(position).amount));
         eText.setInputType(InputType.TYPE_CLASS_PHONE);
-        eText.selectAll();
 
         new AlertDialog.Builder(this)
                 .setIcon(R.mipmap.ic_launcher)
@@ -97,12 +97,10 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
                         if (TextUtils.isDigitsOnly(eText.getText().toString()) && !eText.getText().toString().equals("")) {
-                            adapter.getPoint(position).amount = Integer.valueOf(eText.getText().toString());
-                            adapter.getPoint(position).priceTotal = new Rounding().round_up(Integer.valueOf(eText.getText().toString()) * adapter.getPoint(position).priceUnit);
-                            tvSummary.setText(String.valueOf(adapter.getSummary()) + " грн");
-                            adapter.notifyDataSetChanged();
+                            int amount = Integer.valueOf(eText.getText().toString());
+                            float priceUnit = pointAdapter.getPoint(position).priceUnit;
+                            refreshPriceList(position, amount, priceUnit);
                         } else
                             Toast.makeText(getApplicationContext(), "Неверный ввод!", Toast.LENGTH_SHORT).show();
                     }
@@ -110,10 +108,7 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
                 .setNeutralButton("Удалить", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        adapter.getPoint(position).amount = 0;
-                        adapter.getPoint(position).priceTotal = 0;
-                        tvSummary.setText(String.valueOf(adapter.getSummary()) + " грн");
-                        adapter.notifyDataSetChanged();
+                        refreshPriceList(position, 0, 0);
                     }
                 })
                 .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
@@ -122,6 +117,14 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
                         dialog.cancel();
                     }
                 }).show();
+    }
+
+    private void refreshPriceList(int position, int amount, float priceUnit) {
+        pointAdapter.getPoint(position).amount = amount;
+        pointAdapter.getPoint(position).priceTotal = new Rounding().round_up(amount * priceUnit);
+        pointAdapter.notifyDataSetChanged();
+
+        tvSummary.setText(pointAdapter.getSummary() + " грн");
     }
 
     @Override
@@ -133,11 +136,16 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
     public void onClick(View view) {
         int id = view.getId();
         if (id == R.id.btnCreatePrice) {
-            if (adapter.getSummary() == 0)
+            if (pointAdapter.getSummary() == 0)
                 Toast.makeText(this, "Список пуст!", Toast.LENGTH_SHORT).show();
             else {
                 Intent intent = new Intent(this, SelectedPriceActivity.class);
-                intent.putParcelableArrayListExtra("Price", adapter.getSelectedPoints());
+                intent.putExtra("org", tvOrganization.getText());
+                intent.putExtra("addr", tvAddress.getText());
+                intent.putExtra("price", tvPrice.getText());
+                intent.putExtra("summary", tvSummary.getText());
+
+                intent.putParcelableArrayListExtra("PriceList", pointAdapter.getSelectedPoints());
                 startActivityForResult(intent, 1);
             }
         }
@@ -151,14 +159,14 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
         ArrayList<Point> selectedPoints = data.getParcelableArrayListExtra("Price");
 
         for (Point sPoint : selectedPoints)
-            for (Point point : price)
+            for (Point point : priceArray)
                 if (point.name.equals(sPoint.name)) {
                     point.amount = sPoint.amount;
                     point.priceTotal = new Rounding().round_up(point.priceUnit * point.amount);
                 }
 
-        tvSummary.setText(String.valueOf(adapter.getSummary()) + " грн");
-        adapter.notifyDataSetChanged();
+        tvSummary.setText(String.valueOf(pointAdapter.getSummary()) + " грн");
+        pointAdapter.notifyDataSetChanged();
 
         super.onActivityResult(requestCode, resultCode, data);
     }

@@ -6,71 +6,133 @@
     android:padding="5dp">
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:divider="@color/colorPrimary"
-        android:dividerPadding="2dp">
+        android:dividerPadding="2dp"
+        android:orientation="horizontal">
 
         <Button
+            android:id="@+id/btnSavePrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Save"
-            android:id="@+id/btnSavePrice"
-            android:background="@android:drawable/btn_default" />
+            android:background="@android:drawable/btn_default"
+            android:text="Сохранить" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="∑ "
             android:layout_weight="1"
-            android:gravity="right" />
+            android:gravity="right"
+            android:text="∑ "
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <TextView
+            android:id="@+id/tvSelectedSummary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="0.0 грн"
-            android:id="@+id/tvSelectedSummary"
+            android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@android:color/primary_text_light" />
 
     </LinearLayout>
 
     <ListView
+        android:id="@+id/selectedPriceList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/selectedPriceList"
         android:layout_gravity="center_horizontal"
         android:layout_weight="1"
-        android:divider="@drawable/devider"
         android:background="@android:drawable/edit_text"
+        android:divider="@drawable/devider"
         android:dividerHeight="1dip" />
 
-<!--
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <Button
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:id="@+id/btnSelectedSearchCancel"
-            android:background="@android:drawable/btn_dialog" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/etSelectedSearch"
-            android:layout_weight="1" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Организация:"
+                android:paddingRight="5dp" />
 
-        <Button
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:id="@+id/btnSelectedSearch"
-            android:background="@android:drawable/ic_menu_search" />
+            <TextView
+                android:id="@+id/tvSelectedOrganization"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Адрес:"
+                android:paddingRight="5dp" />
+
+            <TextView
+                android:id="@+id/tvSelectedAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Цена:"
+                android:paddingRight="5dp" />
+
+            <TextView
+                android:id="@+id/tvSelectedPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
+
     </LinearLayout>
--->
+
+
+    <!--
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:id="@+id/btnSelectedSearchCancel"
+                android:background="@android:drawable/btn_dialog" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/etSelectedSearch"
+                android:layout_weight="1" />
+
+            <Button
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:id="@+id/btnSelectedSearch"
+                android:background="@android:drawable/ic_menu_search" />
+        </LinearLayout>
+    -->
 
 </LinearLayout>

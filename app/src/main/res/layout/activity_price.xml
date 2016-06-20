@@ -15,7 +15,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Create"
+            android:text="Создать"
             android:id="@+id/btnCreatePrice"
             android:background="@android:drawable/btn_default" />
 
@@ -42,35 +42,96 @@
         android:layout_height="wrap_content"
         android:id="@+id/priceList"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="1"
         android:background="@android:drawable/edit_text"
         android:divider="@drawable/devider"
-        android:dividerHeight="1dip" />
+        android:dividerHeight="1dip"
+        android:layout_weight="1" />
 
-<!--
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <Button
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:id="@+id/btnSearchCancel"
-            android:background="@android:drawable/btn_dialog" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/etSearch"
-            android:layout_weight="1" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Организация:"
+                android:paddingRight="5dp" />
 
-        <Button
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:id="@+id/btnSearch"
-            android:background="@android:drawable/ic_menu_search" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvOrganization"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Адрес:"
+                android:paddingRight="5dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvAddress"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Цена:"
+                android:paddingRight="5dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvPrice"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
+
     </LinearLayout>
--->
+
+    <!--
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:id="@+id/btnSearchCancel"
+                android:background="@android:drawable/btn_dialog" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/etSearch"
+                android:layout_weight="1" />
+
+            <Button
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:id="@+id/btnSearch"
+                android:background="@android:drawable/ic_menu_search" />
+        </LinearLayout>
+    -->
 
 </LinearLayout>
