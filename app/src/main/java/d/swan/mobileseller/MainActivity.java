@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -38,12 +39,15 @@ public class MainActivity extends AppCompatActivity
 
     DataBaseHelper dbHelper = new DataBaseHelper(this);
 
+    Properties properties = new Properties(this);
+
+    boolean isFirstLoad_org = true;
+    boolean isFirstLoad_addr = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // startActivity(new Intent(this, PriceActivity.class));
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarMain);
         setSupportActionBar(toolbar);
@@ -81,9 +85,14 @@ public class MainActivity extends AppCompatActivity
         spinnerAddrName = (Spinner) findViewById(R.id.spinnerAddrName);
         spinnerAddrName.setOnItemSelectedListener(this);
 
-        refreshOrgSpinner();
-        refreshAddrSpinner();
+        properties.loadPositions();
 
+        refreshOrgSpinner();
+
+        if (properties.isRetail)
+            radioRetail.setChecked(true);
+        else
+            radioWholesale.setChecked(true);
     }
 
     private void refreshOrgSpinner() {
@@ -93,20 +102,41 @@ public class MainActivity extends AppCompatActivity
         orgAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, orgArray);
         orgAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerOrgName.setAdapter(orgAdapter);
+        if (isFirstLoad_org) {
+            spinnerOrgName.setSelection(properties.orgPos);
+            isFirstLoad_org = false;
+        }
+
         orgAdapter.notifyDataSetChanged();
     }
 
     private void refreshAddrSpinner() {
         addrArray.clear();
-        if (spinnerOrgName.getSelectedItemPosition() > -1) {
+        if (spinnerOrgName.getCount() > 0) {
             int linked_id = dbHelper.getLinkedIdByName("Organization", spinnerOrgName.getSelectedItem().toString());
             addrArray.addAll(dbHelper.getAllValues("Address", linked_id));
-        }
 
-        addrAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, addrArray);
-        addrAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerAddrName.setAdapter(addrAdapter);
-        addrAdapter.notifyDataSetChanged();
+            addrAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, addrArray);
+            addrAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinnerAddrName.setAdapter(addrAdapter);
+            if (isFirstLoad_addr) {
+                spinnerAddrName.setSelection(properties.addrPos);
+                isFirstLoad_addr = false;
+            }
+
+            addrAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) throws NullPointerException {
+        if (adapterView.getId() == R.id.spinnerOrgName)
+            refreshAddrSpinner();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+        // Nothing
     }
 
     @Override
@@ -145,6 +175,13 @@ public class MainActivity extends AppCompatActivity
                             .setPositiveButton("Да", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
+
+                                    properties.savePositions(
+                                            spinnerOrgName.getSelectedItemPosition(),
+                                            spinnerAddrName.getSelectedItemPosition(),
+                                            radioRetail.isChecked()
+                                    );
+
                                     finish();
                                 }
                             })
@@ -159,17 +196,6 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) throws NullPointerException {
-        if (adapterView.getId() == R.id.spinnerOrgName)
-            refreshAddrSpinner();
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-        // Nothing
     }
 
     @Override
@@ -188,10 +214,11 @@ public class MainActivity extends AppCompatActivity
 
                 if (radioRetail.isChecked()) {
                     intent.putExtra("price", "Розничная");
-                    intent.putParcelableArrayListExtra("PriceList", dbHelper.getRetailPrice());
+
+                    intent.putParcelableArrayListExtra("PriceList", new PriceListFiller(getResources()).getRetailPrice());
                 } else {
                     intent.putExtra("price", "Оптовая");
-                    intent.putParcelableArrayListExtra("PriceList", dbHelper.getWholesalePrice());
+                    intent.putParcelableArrayListExtra("PriceList", new PriceListFiller(getResources()).getWholesalePrice());
                 }
 
                 startActivity(intent);
@@ -320,11 +347,13 @@ public class MainActivity extends AppCompatActivity
                         }
     }
 
+
 /*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (data == null)
             return;
+
         File file = new File(data.getData().toString());
         String sub = file.getPath().substring(5, file.getPath().length());
         ExcelWorker worker = new ExcelWorker();
@@ -336,4 +365,5 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
     }
 */
+
 }

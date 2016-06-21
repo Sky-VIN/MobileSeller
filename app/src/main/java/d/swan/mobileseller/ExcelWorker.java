@@ -1,9 +1,12 @@
 package d.swan.mobileseller;
 
+import android.text.TextUtils;
+
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.formula.functions.BaseNumberUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -13,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.IllegalFormatException;
 
 /**
  * Created by daniel on 6/12/16.
@@ -50,10 +54,10 @@ public final class ExcelWorker {
         styleNormal.setBorderLeft((short) 1);
 
         // размеры колонок
-        sheet.setColumnWidth(0, 10000);
-        sheet.setColumnWidth(1, 1500);
+        sheet.setColumnWidth(0, 12500);
+        sheet.setColumnWidth(1, 2000);
         sheet.setColumnWidth(2, 1500);
-        sheet.setColumnWidth(3, 2000);
+        sheet.setColumnWidth(3, 2500);
 
 
         // строки организации и адреса
@@ -72,7 +76,7 @@ public final class ExcelWorker {
         for (Point point : priceArray)
             rowFill(styleNormal, point.name,
                     String.valueOf(new Rounding().round_up(point.priceUnit)),
-                    String.valueOf(new Rounding().round_up(point.amount)),
+                    String.valueOf(point.amount),
                     String.valueOf(new Rounding().round_up(point.priceTotal))
             );
 
@@ -82,16 +86,20 @@ public final class ExcelWorker {
         rowFill(styleBold, "ИТОГ:", "", "", String.valueOf(summary));
 
         // запись созданного в памяти Excel документа в файл
-        File dir = new File("/sdcard/Mobile Seller");
-        if (!dir.exists())
-            dir.mkdir();
 
-        File file = new File("/sdcard/Mobile Seller/" + datetime + ".xls");
+        // проверка на наличие папки
+        String filename = "/sdcard/Mobile Seller";
+        File dir = new File(filename);
+        if (!dir.exists()) dir.mkdir();
+
+
+        filename = "/sdcard/Mobile Seller/" + datetime + ".xls";
+        File file = new File(filename);
         FileOutputStream out = new FileOutputStream(file);
         workbook.write(out);
 
         // возвращает полный путь сохраненного документа
-        return ("/sdcard/Mobile Seller/" + datetime + ".xls");
+        return filename;
     }
 
     private static void rowFill(CellStyle style, String... args) {
@@ -99,7 +107,12 @@ public final class ExcelWorker {
         int count = 0;
         for (String s : args) {
             cell = row.createCell(count++);
-            cell.setCellValue(s);
+            try {
+                cell.setCellValue(Float.parseFloat(s));
+            } catch (IllegalArgumentException e) {
+                cell.setCellValue(s);
+            }
+
             cell.setCellStyle(style);
         }
     }

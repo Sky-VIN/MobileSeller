@@ -8,6 +8,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -55,6 +56,7 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
 
         priceList = (ListView) findViewById(R.id.priceList);
         priceList.setOnItemClickListener(this);
+
         priceArray.addAll(getIntent().<Point>getParcelableArrayListExtra("PriceList"));
 
         pointAdapter = new PointAdapter(this, priceArray);
@@ -124,7 +126,7 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
         pointAdapter.getPoint(position).priceTotal = new Rounding().round_up(amount * priceUnit);
         pointAdapter.notifyDataSetChanged();
 
-        tvSummary.setText(pointAdapter.getSummary() + " грн");
+        tvSummary.setText(String.valueOf(pointAdapter.getSummary() + " грн"));
     }
 
     @Override
@@ -153,8 +155,10 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (data == null)
+        if (data == null) {
+            Toast.makeText(this, "Data is null", Toast.LENGTH_SHORT).show();
             return;
+        }
 
         ArrayList<Point> selectedPoints = data.getParcelableArrayListExtra("Price");
 
@@ -165,7 +169,7 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
                     point.priceTotal = new Rounding().round_up(point.priceUnit * point.amount);
                 }
 
-        tvSummary.setText(String.valueOf(pointAdapter.getSummary()) + " грн");
+        tvSummary.setText(String.valueOf(pointAdapter.getSummary() + " грн"));
         pointAdapter.notifyDataSetChanged();
 
         super.onActivityResult(requestCode, resultCode, data);

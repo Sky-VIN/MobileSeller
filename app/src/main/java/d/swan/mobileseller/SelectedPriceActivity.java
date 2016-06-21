@@ -7,9 +7,9 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.menu.ActionMenuItem;
 import android.text.InputType;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -108,18 +108,21 @@ public class SelectedPriceActivity extends AppCompatActivity implements AdapterV
         pointAdapter.getPoint(position).priceTotal = new Rounding().round_up(amount * priceUnit);
         pointAdapter.notifyDataSetChanged();
 
-        tvSelectedSummary.setText(pointAdapter.getSummary() + " грн");
+        tvSelectedSummary.setText(String.valueOf(pointAdapter.getSummary() + " грн"));
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            Intent intent = new Intent();
-            intent.putParcelableArrayListExtra("Price", selectedPriceArray);
-            setResult(RESULT_OK, intent);
-            finish();
-        }
+        if (item.getItemId() == android.R.id.home)
+            goHome();
         return super.onOptionsItemSelected(item);
+    }
+
+    private void goHome() {
+        Intent intent = new Intent();
+        intent.putParcelableArrayListExtra("Price", selectedPriceArray);
+        setResult(RESULT_OK, intent);
+        finish();
     }
 
     @Override
@@ -131,9 +134,9 @@ public class SelectedPriceActivity extends AppCompatActivity implements AdapterV
     public void onClick(View view) {
         int id = view.getId();
         if (id == R.id.btnSavePrice) {
-            ExcelWorker excelWorker = new ExcelWorker();
+            new ExcelWorker();
             try {
-                final String filename = excelWorker.writeIntoExcel(getIntent().getStringExtra("org"), getIntent().getStringExtra("addr"), selectedPriceArray, pointAdapter.getSummary());
+                final String filename = ExcelWorker.writeIntoExcel(getIntent().getStringExtra("org"), getIntent().getStringExtra("addr"), selectedPriceArray, pointAdapter.getSummary());
                 new AlertDialog.Builder(this)
                         .setIcon(R.mipmap.ic_launcher)
                         .setTitle(R.string.app_name)
@@ -142,13 +145,14 @@ public class SelectedPriceActivity extends AppCompatActivity implements AdapterV
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
                                 sendEmail(new File(filename));
-                                finish();
+                                goHome();
                             }
                         })
                         .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
                                 dialog.cancel();
+                                goHome();
                             }
                         }).show();
             } catch (IOException e) {

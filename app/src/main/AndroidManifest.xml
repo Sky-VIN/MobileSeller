@@ -27,12 +27,10 @@
         </activity>
         <activity
             android:name=".PriceActivity"
-            android:label="Список товара"
-            android:launchMode="singleTask" />
+            android:label="Список товара" />
         <activity
             android:name=".SelectedPriceActivity"
-            android:label="Список выбраного товара"
-            android:launchMode="singleTask" />
+            android:label="Список выбраного товара" />
         <activity
             android:name=".SettingsActivity"
             android:label="Настройки" />

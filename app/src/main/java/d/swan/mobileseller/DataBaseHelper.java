@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,18 +26,25 @@ public final class DataBaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE IF NOT EXISTS Organization (" +
                 "id INTEGER NOT NULL PRIMARY KEY," +
                 "name TEXT NOT NULL," +
-                "linked_id INTEGER NOT NULL);");
+                "linked_id INTEGER NOT NULL);"
+        );
 
         db.execSQL("CREATE TABLE IF NOT EXISTS Address (" +
                 "id INTEGER NOT NULL PRIMARY KEY," +
                 "name TEXT NOT NULL," +
-                "linked_id INTEGER NOT NULL);");
+                "linked_id INTEGER NOT NULL);"
+        );
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS Price (" +
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS MailSettings (" +
                 "id INTEGER NOT NULL PRIMARY KEY," +
-                "name TEXT NOT NULL," +
-                "wholesale_price REAL NOT NULL," +
-                "retail_price REAL NOT NULL);");
+                "user TEXT NOT NULL," +
+                "sender TEXT NOT NULL," +
+                "pass TEXT NOT NULL," +
+                "smtp TEXT NOT NULL," +
+                "port TEXT NOT NULL," +
+                "receiver TEXT NOT NULL);"
+        );
 
     }
 
@@ -45,6 +53,48 @@ public final class DataBaseHelper extends SQLiteOpenHelper {
         //
     }
 
+
+    public String[] loadMailSettings() {
+        String[] result = new String[]{"", "", "", "", "", ""};
+
+        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM MailSettings", null);
+
+
+        if (cursor.moveToFirst()) {
+            int userColIndex = cursor.getColumnIndex("user");
+            int senderColIndex = cursor.getColumnIndex("sender");
+            int passColIndex = cursor.getColumnIndex("pass");
+            int smtpColIndex = cursor.getColumnIndex("smtp");
+            int portColIndex = cursor.getColumnIndex("port");
+            int receiverColIndex = cursor.getColumnIndex("receiver");
+            do {
+                Log.d("Mseller", String.valueOf(userColIndex + " " + senderColIndex + " " + passColIndex + " " + smtpColIndex + " " + portColIndex + " " + receiverColIndex));
+                result[0] = cursor.getString(userColIndex);
+                result[1] = cursor.getString(senderColIndex);
+                result[2] = cursor.getString(passColIndex);
+                result[3] = cursor.getString(smtpColIndex);
+                result[4] = cursor.getString(portColIndex);
+                result[5] = cursor.getString(receiverColIndex);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        sqLiteDatabase.close();
+        return result;
+    }
+
+    public void saveMailSettings(String[] settings) {
+        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
+        contentValues.put("user", settings[0]);
+        contentValues.put("sender", settings[1]);
+        contentValues.put("pass", settings[2]);
+        contentValues.put("smtp", settings[3]);
+        contentValues.put("port", settings[4]);
+        contentValues.put("receiver", settings[5]);
+
+        sqLiteDatabase.update("MailSettings", contentValues, "id = ?", new String[]{"1"});
+        sqLiteDatabase.close();
+    }
 
     // Добавление поля и связующего ключа (для организации)
     public void addField(String table, String name, int linked_id) {
@@ -103,7 +153,7 @@ public final class DataBaseHelper extends SQLiteOpenHelper {
     // Сбор и возврат всех значений имен из заданой таблицы
     public List<String> getAllValues(String table) {
 
-        List<String> result = new ArrayList();
+        ArrayList<String> result = new ArrayList<String>();
 
         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + table, null);
@@ -196,7 +246,7 @@ public final class DataBaseHelper extends SQLiteOpenHelper {
                     newLinkedId++;
 
                     for (int i : linkedIdArray)
-                        if (newLinkedId == linkedIdArray[i]) {
+                        if (newLinkedId == i) {
                             b = true;
                             break;
                         }
@@ -211,6 +261,7 @@ public final class DataBaseHelper extends SQLiteOpenHelper {
         return newLinkedId;
     }
 
+/*
     // сбор списка с розничными ценами
     public ArrayList<Point> getRetailPrice() {
         ArrayList<Point> priceArray = new ArrayList<>();
@@ -254,9 +305,10 @@ public final class DataBaseHelper extends SQLiteOpenHelper {
 
         return priceArray;
     }
+*/
 
     // Вывод в лог всех полей
-/*
+
     public void getAllLog(String table) {
         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + table, null);
@@ -292,7 +344,7 @@ public final class DataBaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.insert("Price", null, contentValues);
         sqLiteDatabase.close();
     }
-*/
+
 
 }
 

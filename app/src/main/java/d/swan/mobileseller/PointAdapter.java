@@ -52,8 +52,8 @@ public class PointAdapter extends BaseAdapter {
 
         Point point = getPoint(position);
         ((TextView) view.findViewById(R.id.tvName)).setText(point.name);
-        ((TextView) view.findViewById(R.id.tvAmount)).setText(String.valueOf(point.amount) + " шт");
-        ((TextView) view.findViewById(R.id.tvPriceUnit)).setText(String.valueOf(point.priceUnit) + " грн/ед");
+        ((TextView) view.findViewById(R.id.tvAmount)).setText(String.valueOf(point.amount + " шт"));
+        ((TextView) view.findViewById(R.id.tvPriceUnit)).setText(String.valueOf(point.priceUnit + " грн/ед"));
         ((TextView) view.findViewById(R.id.tvPriceTotal)).setText(String.valueOf(point.priceTotal + " грн"));
 
         return view;
@@ -61,20 +61,20 @@ public class PointAdapter extends BaseAdapter {
 
     public float getSummary() {
         float result = 0;
-        for (int i = 0; i < points.size(); i++) {
-            if (points.get(i).amount > 0)
-                result += points.get(i).priceUnit * points.get(i).amount;
-        }
+        for (Point point : points)
+            if (point.amount > 0)
+                result += point.priceUnit * point.amount;
+
         return new Rounding().round_up(result);
     }
 
     public ArrayList<Point> getSelectedPoints() {
         ArrayList<Point> result = new ArrayList<>();
 
-        for (int i = 0; i < points.size(); i++) {
-            if (points.get(i).amount > 0)
-                result.add(points.get(i));
-        }
+        for (Point point : points)
+            if (point.amount > 0)
+                result.add(point);
+
         return result;
     }
 }

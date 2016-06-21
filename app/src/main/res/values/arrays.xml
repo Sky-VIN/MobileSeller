@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="name_array">
+        <item>Куриное Филе соленое 50 гр</item>
+        <item>Куриное Филе острое 50 гр</item>
+        <item>Куриное Филе сладкое 50 гр</item>
+        <item>Индюшиное филе соленое 50 гр</item>
+        <item>Свинина соленая 50 гр</item>
+        <item>Свинина острое 50 гр</item>
+        <item>Свинина сладкая 50 гр</item>
+        <item>Телятина соленая 50 гр</item>
+        <item>Телятина сладкая 50 гр</item>
+        <item>Куриное Филе соленое 100 гр</item>
+        <item>Куриное Филе острое 100 гр</item>
+        <item>Куриное Филе сладкое 100 гр</item>
+        <item>Индюшиное филе соленое 100 гр</item>
+        <item>Свинина соленая 100 гр</item>
+        <item>Свинина острое 100 гр</item>
+        <item>Свинина сладкая 100 гр</item>
+        <item>Телятина соленая 100 гр</item>
+        <item>Телятина сладкая 100 гр</item>
+        <item>Куриное Филе соленое 500 гр</item>
+        <item>Куриное Филе острое 500 гр</item>
+        <item>Куриное Филе сладкое 500 гр</item>
+        <item>Индюшиное филе соленое 500 гр</item>
+        <item>Свинина соленая 500 гр</item>
+        <item>Свинина острое 500 гр</item>
+        <item>Свинина сладкая 500 гр</item>
+        <item>Телятина соленая 500 гр</item>
+        <item>Телятина сладкая 500 гр</item>
+        <item>Куриное Филе соленое 1000 гр</item>
+        <item>Куриное Филе острое 1000 гр</item>
+        <item>Куриное Филе сладкое 1000 гр</item>
+        <item>Индюшиное филе соленое 1000 гр</item>
+        <item>Свинина соленая 1000 гр</item>
+        <item>Свинина острое 1000 гр</item>
+        <item>Свинина сладкая 1000 гр</item>
+        <item>Телятина соленая 1000 гр</item>
+        <item>Телятина сладкая 1000 гр</item>
+    </string-array>
+
+    <string-array name="wholesale_array">
+        <item>16</item>
+        <item>16</item>
+        <item>16</item>
+        <item>21</item>
+        <item>18</item>
+        <item>18</item>
+        <item>18</item>
+        <item>23</item>
+        <item>23</item>
+        <item>28</item>
+        <item>28</item>
+        <item>28</item>
+        <item>38</item>
+        <item>30</item>
+        <item>30</item>
+        <item>30</item>
+        <item>40</item>
+        <item>40</item>
+        <item>116</item>
+        <item>116</item>
+        <item>116</item>
+        <item>155</item>
+        <item>126</item>
+        <item>126</item>
+        <item>126</item>
+        <item>170</item>
+        <item>170</item>
+        <item>213</item>
+        <item>213</item>
+        <item>213</item>
+        <item>284</item>
+        <item>231</item>
+        <item>231</item>
+        <item>231</item>
+        <item>312</item>
+        <item>312</item>
+    </string-array>
+
+    <string-array name="retail_array">
+        <item>18</item>
+        <item>18</item>
+        <item>18</item>
+        <item>23</item>
+        <item>19</item>
+        <item>19</item>
+        <item>19</item>
+        <item>25</item>
+        <item>25</item>
+        <item>31</item>
+        <item>31</item>
+        <item>31</item>
+        <item>40</item>
+        <item>33</item>
+        <item>33</item>
+        <item>33</item>
+        <item>43</item>
+        <item>43</item>
+        <item>127</item>
+        <item>127</item>
+        <item>127</item>
+        <item>169</item>
+        <item>138</item>
+        <item>138</item>
+        <item>138</item>
+        <item>185</item>
+        <item>185</item>
+        <item>232</item>
+        <item>232</item>
+        <item>232</item>
+        <item>310</item>
+        <item>252</item>
+        <item>252</item>
+        <item>252</item>
+        <item>340</item>
+        <item>340</item>
+    </string-array>
+
+</resources>
