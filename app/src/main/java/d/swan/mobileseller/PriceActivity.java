@@ -155,22 +155,22 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (data == null) {
-            Toast.makeText(this, "Data is null", Toast.LENGTH_SHORT).show();
+        if (data == null)
             return;
-        }
 
-        ArrayList<Point> selectedPoints = data.getParcelableArrayListExtra("Price");
+        if (!getIntent().getBooleanExtra("GoHome", false)) {
+            ArrayList<Point> selectedPoints = data.getParcelableArrayListExtra("Price");
 
-        for (Point sPoint : selectedPoints)
-            for (Point point : priceArray)
-                if (point.name.equals(sPoint.name)) {
-                    point.amount = sPoint.amount;
-                    point.priceTotal = new Rounding().round_up(point.priceUnit * point.amount);
-                }
+            for (Point sPoint : selectedPoints)
+                for (Point point : priceArray)
+                    if (point.name.equals(sPoint.name)) {
+                        point.amount = sPoint.amount;
+                        point.priceTotal = new Rounding().round_up(point.priceUnit * point.amount);
+                    }
 
-        tvSummary.setText(String.valueOf(pointAdapter.getSummary() + " грн"));
-        pointAdapter.notifyDataSetChanged();
+            tvSummary.setText(String.valueOf(pointAdapter.getSummary() + " грн"));
+            pointAdapter.notifyDataSetChanged();
+        } else finish();
 
         super.onActivityResult(requestCode, resultCode, data);
     }

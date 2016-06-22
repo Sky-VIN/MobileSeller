@@ -38,12 +38,12 @@ public final class DataBaseHelper extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS MailSettings (" +
                 "id INTEGER NOT NULL PRIMARY KEY," +
-                "user TEXT NOT NULL," +
-                "sender TEXT NOT NULL," +
-                "pass TEXT NOT NULL," +
-                "smtp TEXT NOT NULL," +
-                "port TEXT NOT NULL," +
-                "receiver TEXT NOT NULL);"
+                "user TEXT," +
+                "sender TEXT," +
+                "pass TEXT," +
+                "smtp TEXT," +
+                "port TEXT," +
+                "receiver TEXT);"
         );
 
     }
@@ -53,13 +53,12 @@ public final class DataBaseHelper extends SQLiteOpenHelper {
         //
     }
 
-
+    // Загрузка настроек почты
     public String[] loadMailSettings() {
-        String[] result = new String[]{"", "", "", "", "", ""};
+        String[] result = new String[6];
 
         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM MailSettings", null);
-
 
         if (cursor.moveToFirst()) {
             int userColIndex = cursor.getColumnIndex("user");
@@ -69,7 +68,6 @@ public final class DataBaseHelper extends SQLiteOpenHelper {
             int portColIndex = cursor.getColumnIndex("port");
             int receiverColIndex = cursor.getColumnIndex("receiver");
             do {
-                Log.d("Mseller", String.valueOf(userColIndex + " " + senderColIndex + " " + passColIndex + " " + smtpColIndex + " " + portColIndex + " " + receiverColIndex));
                 result[0] = cursor.getString(userColIndex);
                 result[1] = cursor.getString(senderColIndex);
                 result[2] = cursor.getString(passColIndex);
@@ -77,22 +75,33 @@ public final class DataBaseHelper extends SQLiteOpenHelper {
                 result[4] = cursor.getString(portColIndex);
                 result[5] = cursor.getString(receiverColIndex);
             } while (cursor.moveToNext());
+
         }
         cursor.close();
         sqLiteDatabase.close();
         return result;
     }
 
+
+    // сохранение настроек почты
     public void saveMailSettings(String[] settings) {
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
-        contentValues.put("user", settings[0]);
-        contentValues.put("sender", settings[1]);
-        contentValues.put("pass", settings[2]);
-        contentValues.put("smtp", settings[3]);
-        contentValues.put("port", settings[4]);
-        contentValues.put("receiver", settings[5]);
 
-        sqLiteDatabase.update("MailSettings", contentValues, "id = ?", new String[]{"1"});
+        sqLiteDatabase.delete("MailSettings", null, null);
+
+        contentValues.put("user", settings[0]);
+        sqLiteDatabase.insert("MailSettings", null, contentValues);
+        contentValues.put("sender", settings[1]);
+        sqLiteDatabase.insert("MailSettings", null, contentValues);
+        contentValues.put("pass", settings[2]);
+        sqLiteDatabase.insert("MailSettings", null, contentValues);
+        contentValues.put("smtp", settings[3]);
+        sqLiteDatabase.insert("MailSettings", null, contentValues);
+        contentValues.put("port", settings[4]);
+        sqLiteDatabase.insert("MailSettings", null, contentValues);
+        contentValues.put("receiver", settings[5]);
+        sqLiteDatabase.insert("MailSettings", null, contentValues);
+
         sqLiteDatabase.close();
     }
 

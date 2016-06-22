@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.EditText;
 
@@ -49,7 +50,6 @@ public class SettingsActivity extends AppCompatActivity {
                     etPort.getText().toString(),
                     etReceiver.getText().toString()
             };
-
             dbHelper.saveMailSettings(mail);
             finish();
         }

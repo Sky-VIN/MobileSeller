@@ -70,7 +70,7 @@ public final class ExcelWorker {
 
 
         // строка оглавления
-        rowFill(styleBold, "Наименование", "Цена", "шт", "Сумма");
+        rowFill(styleBold, "Наименование", "Цена", "шт/кг", "Сумма");
 
         // заполнение листа данными
         for (Point point : priceArray)

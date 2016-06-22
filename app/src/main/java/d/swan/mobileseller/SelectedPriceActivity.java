@@ -114,12 +114,13 @@ public class SelectedPriceActivity extends AppCompatActivity implements AdapterV
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home)
-            goHome();
+            goHome(false);
         return super.onOptionsItemSelected(item);
     }
 
-    private void goHome() {
+    private void goHome(boolean goHome) {
         Intent intent = new Intent();
+        intent.putExtra("GoHome", goHome);
         intent.putParcelableArrayListExtra("Price", selectedPriceArray);
         setResult(RESULT_OK, intent);
         finish();
@@ -144,15 +145,16 @@ public class SelectedPriceActivity extends AppCompatActivity implements AdapterV
                         .setPositiveButton("Да", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
+                                selectedPriceArray.clear();
                                 sendEmail(new File(filename));
-                                goHome();
+                                goHome(true);
                             }
                         })
                         .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
                                 dialog.cancel();
-                                goHome();
+                                goHome(true);
                             }
                         }).show();
             } catch (IOException e) {
@@ -163,11 +165,12 @@ public class SelectedPriceActivity extends AppCompatActivity implements AdapterV
 
     private void sendEmail(File file) {
 
+        String[] mail = new DataBaseHelper(this).loadMailSettings();
         Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 
         emailIntent.setType("file/*");
-        emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"asdf"});
-        emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, R.string.app_name);
+        emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{mail[5]});
+        emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, mail[0]);
 
         Uri uri = Uri.fromFile(file);
         emailIntent.putExtra(Intent.EXTRA_STREAM, uri);
