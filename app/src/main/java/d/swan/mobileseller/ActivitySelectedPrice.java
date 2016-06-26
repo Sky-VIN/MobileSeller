@@ -7,11 +7,11 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.menu.ActionMenuItem;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,7 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class SelectedPriceActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
+public class ActivitySelectedPrice extends AppCompatActivity
+        implements AdapterView.OnItemClickListener, View.OnClickListener {
 
     PointAdapter pointAdapter;
     TextView tvSelectedSummary, tvSelectedOrganization, tvSelectedAddress, tvSelectedPrice;
@@ -32,7 +33,6 @@ public class SelectedPriceActivity extends AppCompatActivity implements AdapterV
     ArrayList<Point> selectedPriceArray = new ArrayList<>();
 
     Button btnSavePrice;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,12 +63,14 @@ public class SelectedPriceActivity extends AppCompatActivity implements AdapterV
         selectedPriceList = (ListView) findViewById(R.id.selectedPriceList);
         selectedPriceList.setOnItemClickListener(this);
         selectedPriceList.setAdapter(pointAdapter);
-
     }
 
     @Override
     public void onItemClick(final AdapterView<?> adapterView, View view, final int position, long l) {
+
         final EditText eText = new EditText(this);
+        eText.setSingleLine();
+        eText.setBackgroundResource(android.R.drawable.edit_text);
         eText.setInputType(InputType.TYPE_CLASS_PHONE);
 
         new AlertDialog.Builder(this)
@@ -78,13 +80,13 @@ public class SelectedPriceActivity extends AppCompatActivity implements AdapterV
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
-                        if (TextUtils.isDigitsOnly(eText.getText().toString()) && !eText.getText().toString().equals("")) {
-                            int amount = Integer.valueOf(eText.getText().toString());
+                        String amountText = eText.getText().toString();
+                        if (TextUtils.isDigitsOnly(amountText) && !amountText.equals("")) {
+                            int amount = Integer.valueOf(amountText);
                             float priceUnit = pointAdapter.getPoint(position).priceUnit;
                             refreshPriceList(position, amount, priceUnit);
                         } else
-                            Toast.makeText(getApplicationContext(), "Неверный ввод!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ActivitySelectedPrice.this, "Неверный ввод!", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setNeutralButton("Удалить", new DialogInterface.OnClickListener() {
@@ -98,8 +100,8 @@ public class SelectedPriceActivity extends AppCompatActivity implements AdapterV
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
-                }).show();
-
+                })
+                .show();
     }
 
 
@@ -114,13 +116,12 @@ public class SelectedPriceActivity extends AppCompatActivity implements AdapterV
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home)
-            goHome(false);
+            goHome();
         return super.onOptionsItemSelected(item);
     }
 
-    private void goHome(boolean goHome) {
+    private void goHome() {
         Intent intent = new Intent();
-        intent.putExtra("GoHome", goHome);
         intent.putParcelableArrayListExtra("Price", selectedPriceArray);
         setResult(RESULT_OK, intent);
         finish();
@@ -133,30 +134,34 @@ public class SelectedPriceActivity extends AppCompatActivity implements AdapterV
 
     @Override
     public void onClick(View view) {
-        int id = view.getId();
-        if (id == R.id.btnSavePrice) {
+        if (view.getId() == R.id.btnSavePrice) {
             new ExcelWorker();
             try {
-                final String filename = ExcelWorker.writeIntoExcel(getIntent().getStringExtra("org"), getIntent().getStringExtra("addr"), selectedPriceArray, pointAdapter.getSummary());
+                String org = getIntent().getStringExtra("org");
+                String addr = getIntent().getStringExtra("addr");
+                final String filename = ExcelWorker.writeIntoExcel(org, addr, selectedPriceArray, pointAdapter.getSummary());
+
                 new AlertDialog.Builder(this)
                         .setIcon(R.mipmap.ic_launcher)
                         .setTitle(R.string.app_name)
-                        .setMessage("Прайс успешно сохранен по адресу\n" + filename + "\n\n Отправить заказ на почту?")
+                        .setMessage("Прайс успешно сохранен по адресу\n" + filename + "\n\n Открыть список сохраненных заказов?")
                         .setPositiveButton("Да", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
-                                selectedPriceArray.clear();
-                                sendEmail(new File(filename));
-                                goHome(true);
+                                //sendEmail(new File(filename));
+                                finish();
+                                startActivity(new Intent(ActivitySelectedPrice.this, ActivitySavedPrices.class));
                             }
                         })
                         .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
                                 dialog.cancel();
-                                goHome(true);
+                                finish();
+                                startActivity(new Intent(ActivitySelectedPrice.this, ActivityMain.class));
                             }
-                        }).show();
+                        })
+                        .show();
             } catch (IOException e) {
                 Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
             }

@@ -8,7 +8,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.EditText;
 
-public class SettingsActivity extends AppCompatActivity {
+public class ActivitySettings extends AppCompatActivity {
 
     DataBaseHelper dbHelper = new DataBaseHelper(this);
 

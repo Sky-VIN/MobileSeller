@@ -316,6 +316,7 @@ public final class DataBaseHelper extends SQLiteOpenHelper {
     }
 */
 
+    /*
     // Вывод в лог всех полей
 
     public void getAllLog(String table) {
@@ -354,6 +355,7 @@ public final class DataBaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.close();
     }
 
+*/
 
 }
 

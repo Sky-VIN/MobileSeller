@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".ActivityMain"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar">
@@ -26,15 +26,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PriceActivity"
+            android:name=".ActivityPrice"
             android:label="Список товара" />
         <activity
-            android:name=".SelectedPriceActivity"
+            android:name=".ActivitySelectedPrice"
             android:label="Список выбраного товара" />
         <activity
-            android:name=".SettingsActivity"
+            android:name=".ActivitySettings"
             android:label="Настройки" />
-
+        <activity
+            android:name=".ActivitySavedPrices"
+            android:label="Сохраненные прайсы" />
     </application>
 
 </manifest>

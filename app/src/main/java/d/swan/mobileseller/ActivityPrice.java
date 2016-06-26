@@ -8,7 +8,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -20,8 +19,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class PriceActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
-
+public class ActivityPrice extends AppCompatActivity
+        implements AdapterView.OnItemClickListener, View.OnClickListener {
 
     TextView tvSummary, tvOrganization, tvAddress, tvPrice;
 
@@ -63,6 +62,25 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
         priceList.setAdapter(pointAdapter);
     }
 
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.btnCreatePrice) {
+            if (pointAdapter.getSummary() == 0)
+                Toast.makeText(this, "Список пуст!", Toast.LENGTH_SHORT).show();
+            else {
+                Intent intent = new Intent(this, ActivitySelectedPrice.class);
+                intent.putExtra("org", tvOrganization.getText());
+                intent.putExtra("addr", tvAddress.getText());
+                intent.putExtra("price", tvPrice.getText());
+                intent.putExtra("summary", tvSummary.getText());
+
+                intent.putParcelableArrayListExtra("PriceList", pointAdapter.getSelectedPoints());
+                startActivityForResult(intent, 1);
+            }
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -81,7 +99,8 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
                         public void onClick(DialogInterface dialogInterface, int i) {
                             finish();
                         }
-                    }).show();
+                    })
+                    .show();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -90,6 +109,8 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
     public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
         final EditText eText = new EditText(this);
+        eText.setSingleLine();
+        eText.setBackgroundResource(android.R.drawable.edit_text);
         eText.setInputType(InputType.TYPE_CLASS_PHONE);
 
         new AlertDialog.Builder(this)
@@ -99,12 +120,13 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (TextUtils.isDigitsOnly(eText.getText().toString()) && !eText.getText().toString().equals("")) {
-                            int amount = Integer.valueOf(eText.getText().toString());
+                        String amountText = eText.getText().toString();
+                        if (TextUtils.isDigitsOnly(amountText) && !amountText.equals("")) {
+                            int amount = Integer.valueOf(amountText);
                             float priceUnit = pointAdapter.getPoint(position).priceUnit;
                             refreshPriceList(position, amount, priceUnit);
                         } else
-                            Toast.makeText(getApplicationContext(), "Неверный ввод!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ActivityPrice.this, "Неверный ввод!", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setNeutralButton("Удалить", new DialogInterface.OnClickListener() {
@@ -118,7 +140,8 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
-                }).show();
+                })
+                .show();
     }
 
     private void refreshPriceList(int position, int amount, float priceUnit) {
@@ -132,25 +155,6 @@ public class PriceActivity extends AppCompatActivity implements AdapterView.OnIt
     @Override
     public void onBackPressed() {
         // Nothing
-    }
-
-    @Override
-    public void onClick(View view) {
-        int id = view.getId();
-        if (id == R.id.btnCreatePrice) {
-            if (pointAdapter.getSummary() == 0)
-                Toast.makeText(this, "Список пуст!", Toast.LENGTH_SHORT).show();
-            else {
-                Intent intent = new Intent(this, SelectedPriceActivity.class);
-                intent.putExtra("org", tvOrganization.getText());
-                intent.putExtra("addr", tvAddress.getText());
-                intent.putExtra("price", tvPrice.getText());
-                intent.putExtra("summary", tvSummary.getText());
-
-                intent.putParcelableArrayListExtra("PriceList", pointAdapter.getSelectedPoints());
-                startActivityForResult(intent, 1);
-            }
-        }
     }
 
     @Override
