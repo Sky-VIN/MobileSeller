@@ -6,103 +6,121 @@
     android:padding="5dp">
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:divider="@color/colorPrimary"
-        android:dividerPadding="2dp">
+        android:dividerPadding="2dp"
+        android:orientation="horizontal">
 
         <Button
+            android:id="@+id/btnCreatePrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Создать"
-            android:id="@+id/btnCreatePrice"
-            android:background="@android:drawable/btn_default" />
+            android:background="@android:drawable/btn_default"
+            android:text="Создать" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="∑ "
             android:layout_weight="1"
-            android:gravity="right" />
+            android:gravity="right"
+            android:text="∑ "
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <TextView
+            android:id="@+id/tvSummary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="0.0 грн"
-            android:id="@+id/tvSummary"
+            android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@android:color/primary_text_light" />
 
     </LinearLayout>
 
     <ListView
+        android:id="@+id/priceList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/priceList"
         android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
         android:background="@android:drawable/edit_text"
         android:divider="@drawable/devider"
-        android:dividerHeight="1dip"
-        android:layout_weight="1" />
+        android:dividerHeight="1dip" />
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Организация:"
-                android:paddingRight="5dp" />
+                android:paddingRight="5dp"
+                android:text="Организация:" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/tvOrganization"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:textColor="@android:color/black" />
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Адрес:"
-                android:paddingRight="5dp" />
+                android:paddingRight="5dp"
+                android:text="Адрес:" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/tvAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:textColor="@android:color/black" />
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Цена:"
-                android:paddingRight="5dp" />
+                android:paddingRight="5dp"
+                android:text="Цена:" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/tvPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="5dp"
+                android:text="Комментарий:" />
+
+            <TextView
+                android:id="@+id/tvPriceComment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:textColor="@android:color/black" />
         </LinearLayout>
 

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 public class ActivityPrice extends AppCompatActivity
         implements AdapterView.OnItemClickListener, View.OnClickListener {
 
-    TextView tvSummary, tvOrganization, tvAddress, tvPrice;
+    TextView tvSummary, tvOrganization, tvAddress, tvPrice, tvPriceComment;
 
     PointAdapter pointAdapter;
     ArrayList<Point> priceArray = new ArrayList<>();
@@ -50,13 +50,20 @@ public class ActivityPrice extends AppCompatActivity
         tvPrice = (TextView) findViewById(R.id.tvPrice);
         tvPrice.setText(getIntent().getStringExtra("price"));
 
+        tvPriceComment = (TextView) findViewById(R.id.tvPriceComment);
+        tvPriceComment.setText(getIntent().getStringExtra("comment"));
+
         btnCreateList = (Button) findViewById(R.id.btnCreatePrice);
         btnCreateList.setOnClickListener(this);
 
         priceList = (ListView) findViewById(R.id.priceList);
         priceList.setOnItemClickListener(this);
 
-        priceArray.addAll(getIntent().<Point>getParcelableArrayListExtra("PriceList"));
+        priceArray.clear();
+        if (getIntent().getStringExtra("price").equals("Розничная"))
+            priceArray.addAll(new PriceListFiller(getResources()).getRetailPrice());
+        else
+            priceArray.addAll(new PriceListFiller(getResources()).getWholesalePrice());
 
         pointAdapter = new PointAdapter(this, priceArray);
         priceList.setAdapter(pointAdapter);
@@ -74,8 +81,9 @@ public class ActivityPrice extends AppCompatActivity
                 intent.putExtra("addr", tvAddress.getText());
                 intent.putExtra("price", tvPrice.getText());
                 intent.putExtra("summary", tvSummary.getText());
+                intent.putExtra("comment", tvPriceComment.getText());
 
-                intent.putParcelableArrayListExtra("PriceList", pointAdapter.getSelectedPoints());
+                intent.putParcelableArrayListExtra("priceList", pointAdapter.getSelectedPoints());
                 startActivityForResult(intent, 1);
             }
         }
@@ -162,19 +170,17 @@ public class ActivityPrice extends AppCompatActivity
         if (data == null)
             return;
 
-        if (!getIntent().getBooleanExtra("GoHome", false)) {
-            ArrayList<Point> selectedPoints = data.getParcelableArrayListExtra("Price");
+        ArrayList<Point> selectedPoints = data.getParcelableArrayListExtra("priceList");
 
-            for (Point sPoint : selectedPoints)
-                for (Point point : priceArray)
-                    if (point.name.equals(sPoint.name)) {
-                        point.amount = sPoint.amount;
-                        point.priceTotal = new Rounding().round_up(point.priceUnit * point.amount);
-                    }
+        for (Point sPoint : selectedPoints)
+            for (Point point : priceArray)
+                if (point.name.equals(sPoint.name)) {
+                    point.amount = sPoint.amount;
+                    point.priceTotal = new Rounding().round_up(point.priceUnit * point.amount);
+                }
 
-            tvSummary.setText(String.valueOf(pointAdapter.getSummary() + " грн"));
-            pointAdapter.notifyDataSetChanged();
-        } else finish();
+        tvSummary.setText(String.valueOf(pointAdapter.getSummary() + " грн"));
+        pointAdapter.notifyDataSetChanged();
 
         super.onActivityResult(requestCode, resultCode, data);
     }

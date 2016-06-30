@@ -1,28 +1,25 @@
 package d.swan.mobileseller;
 
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewGroupCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -39,7 +36,9 @@ public class ActivityMain extends AppCompatActivity
 
     RadioButton radioRetail, radioWholesale;
     Spinner spinnerOrgName, spinnerAddrName;
-    Button btnNewPrice, btnOrgAdd, btnAddrAdd, btnOrgDel, btnAddrDel;
+    Button btnNewPrice, btnOrgAdd, btnAddrAdd, btnOrgDel, btnAddrDel, btnComment;
+
+    TextView tvComment;
 
     DataBaseHelper dbHelper = new DataBaseHelper(this);
 
@@ -78,8 +77,13 @@ public class ActivityMain extends AppCompatActivity
         btnAddrDel = (Button) findViewById(R.id.btnAddrDel);
         btnAddrDel.setOnClickListener(this);
 
+        btnComment = (Button) findViewById(R.id.btnComment);
+        btnComment.setOnClickListener(this);
+
         spinnerOrgName = (Spinner) findViewById(R.id.spinnerOrgName);
         spinnerOrgName.setOnItemSelectedListener(this);
+
+        tvComment = (TextView) findViewById(R.id.tvComment);
 
         spinnerAddrName = (Spinner) findViewById(R.id.spinnerAddrName);
         spinnerAddrName.setOnItemSelectedListener(this);
@@ -184,7 +188,6 @@ public class ActivityMain extends AppCompatActivity
     public void onClick(View view) {
 
         int id = view.getId();
-
 
         final EditText eText = new EditText(this);
         eText.setSingleLine();
@@ -292,21 +295,46 @@ public class ActivityMain extends AppCompatActivity
                                         })
                                         .show();
                             }
-                        }
+                        } else
+                            // Нажатин на кнопку "Комментарий"
+                            if (id == R.id.btnComment) {
+                                new AlertDialog.Builder(this)
+                                        .setIcon(R.mipmap.ic_launcher)
+                                        .setTitle("Внесение комментария")
+                                        .setView(eText)
+                                        .setPositiveButton("Добавить", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                tvComment.setText(eText.getText());
+                                            }
+                                        })
+                                        .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int i) {
+                                                dialog.cancel();
+                                            }
+                                        })
+                                        .setNeutralButton("Удалить", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                tvComment.setText("(пусто)");
+                                            }
+                                        })
+                                        .show();
+                            }
+
     }
 
     private void newPriceButtonClick() {
         Intent intent = new Intent(this, ActivityPrice.class);
         intent.putExtra("org", spinnerOrgName.getSelectedItem().toString());
         intent.putExtra("addr", spinnerAddrName.getSelectedItem().toString());
+        intent.putExtra("comment", tvComment.getText().toString());
 
-        if (radioRetail.isChecked()) {
+        if (radioRetail.isChecked())
             intent.putExtra("price", "Розничная");
-            intent.putParcelableArrayListExtra("PriceList", new PriceListFiller(getResources()).getRetailPrice());
-        } else {
+        else
             intent.putExtra("price", "Оптовая");
-            intent.putParcelableArrayListExtra("PriceList", new PriceListFiller(getResources()).getWholesalePrice());
-        }
 
         startActivity(intent);
     }

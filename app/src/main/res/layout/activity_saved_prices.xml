@@ -13,11 +13,24 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/btnDeletePrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/btn_default"
+            android:text="Удалить" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <Button
             android:id="@+id/btnSendPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:drawable/btn_default"
             android:text="Отправить" />
+
     </LinearLayout>
 
     <ListView
@@ -30,4 +43,4 @@
         android:divider="@drawable/devider"
         android:dividerHeight="1dip" />
 
-    </LinearLayout>
+</LinearLayout>

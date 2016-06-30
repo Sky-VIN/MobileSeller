@@ -3,150 +3,150 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ActivitySettings"
     android:orientation="vertical"
-    android:padding="10dip">
+    android:padding="10dip"
+    tools:context=".ActivitySettings">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:drawable/edit_text">
+        android:background="@android:drawable/edit_text"
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Имя пользователя  приложением:"
-            android:paddingLeft="10dip" />
+            android:paddingLeft="10dip"
+            android:text="Имя пользователя  приложением:" />
 
         <EditText
+            android:id="@+id/etUser"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:id="@+id/etUser"
-            android:background="@android:drawable/edit_text" />
+            android:background="@android:drawable/edit_text"
+            android:ems="10" />
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Настройки почты"
             android:layout_gravity="center_horizontal"
+            android:paddingBottom="10dp"
             android:paddingTop="25dp"
-            android:paddingBottom="10dp" />
+            android:text="Настройки почты"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:drawable/edit_text">
+            android:background="@android:drawable/edit_text"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Отправитель:"
-                android:paddingLeft="10dip" />
+                android:paddingLeft="10dip"
+                android:text="Отправитель:" />
 
             <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:ems="10"
                 android:id="@+id/etSender"
-                android:background="@android:drawable/edit_text" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:drawable/edit_text"
+                android:ems="10"
+                android:inputType="textEmailAddress" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Пароль:"
-                android:paddingLeft="10dip" />
+                android:paddingLeft="10dip"
+                android:text="Пароль:" />
 
             <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:ems="10"
                 android:id="@+id/etPass"
-                android:background="@android:drawable/edit_text" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:drawable/edit_text"
+                android:ems="10"
+                android:inputType="textPassword" />
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:drawable/edit_text">
+            android:background="@android:drawable/edit_text"
+            android:orientation="horizontal">
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="SMTP:"
-                    android:paddingLeft="10dip" />
+                    android:paddingLeft="10dip"
+                    android:text="SMTP:" />
 
                 <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textEmailAddress"
-                    android:ems="10"
                     android:id="@+id/etSMTP"
-                    android:background="@android:drawable/edit_text" />
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:drawable/edit_text"
+                    android:ems="10"
+                    android:inputType="textEmailAddress" />
 
             </LinearLayout>
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="3">
+                android:layout_weight="3"
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Port:"
-                    android:paddingLeft="10dip" />
+                    android:paddingLeft="10dip"
+                    android:text="Port:" />
 
                 <EditText
+                    android:id="@+id/etPort"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@android:drawable/edit_text"
                     android:ems="10"
-                    android:id="@+id/etPort"
-                    android:inputType="phone"
-                    android:background="@android:drawable/edit_text" />
+                    android:inputType="phone" />
 
             </LinearLayout>
 
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:drawable/edit_text">
+            android:background="@android:drawable/edit_text"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Получатель:"
-                android:paddingLeft="10dip" />
+                android:paddingLeft="10dip"
+                android:text="Получатель:" />
 
             <EditText
+                android:id="@+id/etReceiver"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
+                android:background="@android:drawable/edit_text"
                 android:ems="10"
-                android:id="@+id/etReceiver"
-                android:background="@android:drawable/edit_text" />
+                android:inputType="textEmailAddress" />
         </LinearLayout>
 
     </LinearLayout>

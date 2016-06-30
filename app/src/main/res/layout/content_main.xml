@@ -4,102 +4,59 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5dip"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".ActivityMain"
-    tools:showIn="@layout/app_bar_main"
-    android:orientation="vertical"
-    android:padding="5dip">
+    tools:showIn="@layout/app_bar_main">
 
     <Button
+        android:id="@+id/btnNewPrice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Создать"
-        android:id="@+id/btnNewPrice"
         android:layout_gravity="right"
-        android:background="@android:drawable/btn_default" />
+        android:background="@android:drawable/btn_default"
+        android:text="Создать" />
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:drawable/edit_text">
+        android:background="@android:drawable/edit_text"
+        android:orientation="vertical">
 
         <TextView
+            android:id="@+id/tvOrgName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="Организация"
-            android:id="@+id/tvOrgName"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:gravity="center" />
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <Button
+                android:id="@+id/btnOrgAdd"
                 android:layout_width="32dip"
                 android:layout_height="32dip"
-                android:id="@+id/btnOrgAdd"
-                android:background="@android:drawable/ic_input_add"
-                android:layout_gravity="center" />
+                android:layout_gravity="center"
+                android:background="@android:drawable/ic_input_add" />
 
             <Spinner
+                android:id="@+id/spinnerOrgName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/spinnerOrgName"
                 android:layout_weight="1"
                 android:background="@android:drawable/btn_dropdown" />
 
             <Button
-                android:layout_width="24dip"
-                android:layout_height="24dip"
                 android:id="@+id/btnOrgDel"
-                android:background="@android:drawable/ic_delete"
-                android:layout_gravity="center" />
-
-        </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:drawable/edit_text">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Адрес"
-            android:id="@+id/tvAddrName"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:gravity="center" />
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Button
-                android:layout_width="32dip"
-                android:layout_height="32dip"
-                android:id="@+id/btnAddrAdd"
-                android:background="@android:drawable/ic_input_add"
-                android:layout_gravity="center" />
-
-            <Spinner
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/spinnerAddrName"
-                android:layout_weight="1"
-                android:background="@android:drawable/btn_dropdown" />
-
-            <Button
                 android:layout_width="24dip"
                 android:layout_height="24dip"
-                android:id="@+id/btnAddrDel"
-                android:background="@android:drawable/ic_delete"
-                android:layout_gravity="center" />
+                android:layout_gravity="center"
+                android:background="@android:drawable/ic_delete" />
 
         </LinearLayout>
     </LinearLayout>
@@ -108,8 +65,51 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:drawable/edit_text"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvAddrName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Адрес"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnAddrAdd"
+                android:layout_width="32dip"
+                android:layout_height="32dip"
+                android:layout_gravity="center"
+                android:background="@android:drawable/ic_input_add" />
+
+            <Spinner
+                android:id="@+id/spinnerAddrName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@android:drawable/btn_dropdown" />
+
+            <Button
+                android:id="@+id/btnAddrDel"
+                android:layout_width="24dip"
+                android:layout_height="24dip"
+                android:layout_gravity="center"
+                android:background="@android:drawable/ic_delete" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:drawable/edit_text"
+        android:gravity="center"
+        android:orientation="horizontal">
 
 
         <RadioGroup
@@ -118,20 +118,42 @@
             android:orientation="horizontal">
 
             <RadioButton
+                android:id="@+id/radioRetail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Розничная цена"
-                android:id="@+id/radioRetail"
-                android:checked="true" />
+                android:checked="true"
+                android:text="Розничная цена" />
 
             <RadioButton
+                android:id="@+id/radioWholesale"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Оптовая цена"
-                android:id="@+id/radioWholesale"
-                android:checked="false" />
+                android:checked="false"
+                android:text="Оптовая цена" />
 
         </RadioGroup>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvComment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="(пусто)" />
+
+        <Button
+            android:id="@+id/btnComment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Комментарий" />
+
     </LinearLayout>
 
     <!--

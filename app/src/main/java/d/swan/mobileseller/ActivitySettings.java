@@ -1,10 +1,8 @@
 package d.swan.mobileseller;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.EditText;
 
@@ -42,7 +40,7 @@ public class ActivitySettings extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
 
-            String[] mail = new String[] {
+            String[] mail = new String[]{
                     etUser.getText().toString(),
                     etSender.getText().toString(),
                     etPass.getText().toString(),

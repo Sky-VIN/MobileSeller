@@ -1,12 +1,11 @@
 package d.swan.mobileseller;
 
-import android.text.TextUtils;
+import android.os.Environment;
 
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.formula.functions.BaseNumberUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -14,31 +13,61 @@ import org.apache.poi.ss.usermodel.Row;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.IllegalFormatException;
 
 /**
  * Created by daniel on 6/12/16.
  */
-public final class ExcelWorker {
+public class ExcelWorker {
 
-    private static String datetime = new SimpleDateFormat("dd.MM.yyyy HH-mm-ss").format(System.currentTimeMillis());
+    private String datetime;
+    private String organization;
+    private String address;
+    private String comment;
+    private float summary;
+    private ArrayList<Point> priceArray = new ArrayList<>();
 
-    private static int rowNum = 0; // счетчик для строк
+    private int rowNum = 0; // счетчик для строк
 
-    private static Cell cell; //ячейка
-    private static Row row; // строка
+    private HSSFWorkbook workbook = new HSSFWorkbook(); // создание самого excel файла в памяти
 
-    private static HSSFWorkbook workbook = new HSSFWorkbook(); // создание самого excel файла в памяти
-    private static HSSFSheet sheet = workbook.createSheet(datetime); // создание листа с названием
+    private HSSFSheet sheet; // создание листа с названием
+    private Row row; // строка
+    private Cell cell; //ячейка
 
-    private static HSSFFont font = workbook.createFont(); // создание шрифта
-    private static HSSFCellStyle styleNormal = workbook.createCellStyle(); // обычный стиль
-    private static HSSFCellStyle styleBold = workbook.createCellStyle(); // жирный стиль
+    private HSSFFont font = workbook.createFont(); // создание шрифта
+    private HSSFCellStyle styleNormal = workbook.createCellStyle(); // жирный стиль
+    private HSSFCellStyle styleBold = workbook.createCellStyle(); // жирный стиль
 
-    public static String writeIntoExcel(String organization, String address, ArrayList<Point> priceArray, float summary) throws IOException {
 
+    public void setDateTime(String datetime) {
+        this.datetime = datetime;
+    }
+
+    public void setOrganization(String organization) {
+        this.organization = organization;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public void setPriceArray(ArrayList<Point> priceArray) {
+        this.priceArray.clear();
+        this.priceArray.addAll(priceArray);
+    }
+
+    public void setSummary(float summary) {
+        this.summary = summary;
+    }
+
+
+    private void setStyleBold() {
         // жирный стиль
         font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
         styleBold.setFont(font);
@@ -46,63 +75,66 @@ public final class ExcelWorker {
         styleBold.setBorderTop((short) 1);
         styleBold.setBorderBottom((short) 1);
         styleBold.setBorderLeft((short) 1);
+    }
 
+    private void setStyleNormal() {
         // обычный стиль
         styleNormal.setBorderRight((short) 1);
         styleNormal.setBorderTop((short) 1);
         styleNormal.setBorderBottom((short) 1);
         styleNormal.setBorderLeft((short) 1);
+    }
 
+    private void setColumnsWidth() {
         // размеры колонок
         sheet.setColumnWidth(0, 12500);
         sheet.setColumnWidth(1, 2000);
         sheet.setColumnWidth(2, 1500);
         sheet.setColumnWidth(3, 2500);
+    }
 
-
-        // строки организации и адреса
+    private void setOrganizationRow() {
         row = sheet.createRow(rowNum);
         cell = row.createCell(0);
         cell.setCellValue("Организация: " + organization);
+    }
+
+    private void setAddressRow() {
         row = sheet.createRow(++rowNum);
         cell = row.createCell(0);
         cell.setCellValue("Адрес: " + address);
+    }
 
 
-        // строка оглавления
-        rowFill(styleBold, "Наименование", "Цена", "шт/кг", "Сумма");
-
-        // заполнение листа данными
+    private void priceFill() {
         for (Point point : priceArray)
             rowFill(styleNormal, point.name,
                     String.valueOf(new Rounding().round_up(point.priceUnit)),
                     String.valueOf(point.amount),
                     String.valueOf(new Rounding().round_up(point.priceTotal))
             );
+    }
 
-        // пустая строка
-        rowFill(styleNormal, "", "", "", "");
-        // строка итога
-        rowFill(styleBold, "ИТОГ:", "", "", String.valueOf(summary));
+    private void setCommentRow() {
+        row = sheet.createRow(++rowNum);
+        cell = row.createCell(0);
+        cell.setCellValue("Комментарий: " + comment);
+    }
 
-        // запись созданного в памяти Excel документа в файл
-
+    private void write() throws IOException {
         // проверка на наличие папки
-        String filename = "/sdcard/Mobile Seller";
+        String filename = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Mobile Seller";
         File dir = new File(filename);
         if (!dir.exists()) dir.mkdir();
 
-
-        filename = "/sdcard/Mobile Seller/" + datetime + ".xls";
+        // запись
+        filename = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Mobile Seller/" + datetime + ".xls";
         File file = new File(filename);
         FileOutputStream out = new FileOutputStream(file);
         workbook.write(out);
-
-        // возвращает полный путь сохраненного документа
-        return filename;
     }
 
-    private static void rowFill(CellStyle style, String... args) {
+    private void rowFill(CellStyle style, String... args) {
         row = sheet.createRow(++rowNum);
         int count = 0;
         for (String s : args) {
@@ -112,9 +144,38 @@ public final class ExcelWorker {
             } catch (IllegalArgumentException e) {
                 cell.setCellValue(s);
             }
-
             cell.setCellStyle(style);
         }
+    }
+
+    public void writeIntoExcel() throws IOException {
+        sheet = workbook.createSheet(datetime); // создание листа с названием
+
+        setColumnsWidth();
+
+        setStyleBold();
+        setStyleNormal();
+
+        setOrganizationRow();
+        setAddressRow();
+
+        // строка оглавления
+        rowFill(styleBold, "Наименование", "Цена", "шт/кг", "Сумма");
+
+        // заполнение листа данными
+        priceFill();
+
+        // пустая строка
+        rowFill(styleNormal, "", "", "", "");
+
+        // строка итога
+        rowFill(styleBold, "ИТОГ:", "", "", String.valueOf(summary));
+
+        // строка комментария
+        setCommentRow();
+
+        // запись созданного в памяти Excel документа в файл
+        write();
     }
 
 /*
